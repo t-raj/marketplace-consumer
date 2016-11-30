@@ -16,6 +16,37 @@ Search products:
 <form action="searchProduct">
 	
 </form>
+
 <!-- dynamic links -->
+
+<table class="tablesorter">
+		
+			<thead class="thfloat textbold">
+			    <tr>
+			    	<th></th>
+			    	<th></th>			
+			    </tr>
+		    </thead>
+			<tbody class="texttd">
+			    <c:forEach items="${questionForm.questionTOs}" var="questionTO" varStatus="status">
+			        <tr>
+			            <td><input type="hidden" name="questionTOs[${status.index}].questionId" value="${questionTO.questionId}"/></td> 			           
+			            <td>
+			            	${questionTO.questionId}) ${questionTO.question}<br>
+			            	<div>
+				            	<c:forEach items="${questionTO.answerTOs}" var="answerTO">
+									<input type="radio" name="questionTOs[${status.index}].selectedAnswer" value="${answerTO.answerId}"> ${answerTO.answer}<br>
+								</c:forEach>
+							</div>
+							<br>
+							<div>
+								<input type="radio" name="questionTOs[${status.index}].selectedWeight" value="0" checked> Not Important<br>
+								<input type="radio" name="questionTOs[${status.index}].selectedWeight" value="1" checked> Very Important<br>
+							</div>	
+			            </td>
+			       </tr>
+			    </c:forEach>
+		    </tbody>
+		</table>
 </body>
 </html>
