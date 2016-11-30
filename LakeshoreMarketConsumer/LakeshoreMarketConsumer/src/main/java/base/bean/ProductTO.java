@@ -1,4 +1,4 @@
-package bean;
+package base.bean;
 
 public class ProductTO {
 	

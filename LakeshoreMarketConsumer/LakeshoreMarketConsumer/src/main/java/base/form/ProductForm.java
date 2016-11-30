@@ -1,8 +1,9 @@
-package form;
+package base.form;
 
 import java.util.List;
 
-import bean.ProductTO;
+import base.bean.ProductTO;
+
 
 public class ProductForm {
 	

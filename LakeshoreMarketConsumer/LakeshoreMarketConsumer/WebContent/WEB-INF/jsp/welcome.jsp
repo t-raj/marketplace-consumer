@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
+    <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+    
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
@@ -7,17 +11,19 @@
 <title>Welcome</title>
 </head>
 <body>
-Login/Register:
-
 Search products:
 
 <!-- form to get products -->
 
-<form action="searchProduct">
+<form action="products">
+  Please enter the product number to find a product:
+  <input type="text" name="productNumber" value="" /><br/>    
+  <input type="submit" value="Search"/>  
 	
 </form>
 
 <!-- dynamic links -->
+		<form:form method="POST" action="submitSurvey.do" modelAttribute="partnerForm">
 
 <table class="tablesorter">
 		
@@ -28,25 +34,16 @@ Search products:
 			    </tr>
 		    </thead>
 			<tbody class="texttd">
-			    <c:forEach items="${questionForm.questionTOs}" var="questionTO" varStatus="status">
+			    <c:forEach items="${partnerForm.partnerTOList}" var="partnerTO" varStatus="status">
 			        <tr>
-			            <td><input type="hidden" name="questionTOs[${status.index}].questionId" value="${questionTO.questionId}"/></td> 			           
+			            <td><input type="hidden" name="partnerTOList[${status.index}].id" value="${partnerTO.id}"/></td> 			           
 			            <td>
-			            	${questionTO.questionId}) ${questionTO.question}<br>
-			            	<div>
-				            	<c:forEach items="${questionTO.answerTOs}" var="answerTO">
-									<input type="radio" name="questionTOs[${status.index}].selectedAnswer" value="${answerTO.answerId}"> ${answerTO.answer}<br>
-								</c:forEach>
-							</div>
-							<br>
-							<div>
-								<input type="radio" name="questionTOs[${status.index}].selectedWeight" value="0" checked> Not Important<br>
-								<input type="radio" name="questionTOs[${status.index}].selectedWeight" value="1" checked> Very Important<br>
-							</div>	
+			            	${partnerTO.id}) ${partnerTO.lastName}<br>
 			            </td>
 			       </tr>
 			    </c:forEach>
 		    </tbody>
 		</table>
+</form:form>
 </body>
 </html>

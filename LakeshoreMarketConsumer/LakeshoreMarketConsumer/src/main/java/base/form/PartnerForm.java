@@ -1,8 +1,9 @@
-package form;
+package base.form;
 
 import java.util.List;
 
-import bean.PartnerTO;
+import base.bean.PartnerTO;
+
 
 public class PartnerForm {
 

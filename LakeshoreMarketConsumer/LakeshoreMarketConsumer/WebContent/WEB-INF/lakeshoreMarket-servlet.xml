@@ -9,13 +9,13 @@
           http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd">
           
 	<context:annotation-config/>
-	<context:component-scan base-package="main.java"/>
+	<context:component-scan base-package= "base"/>
 
 	<!-- Configures the @Controller programming model -->
 	<mvc:annotation-driven />
 
-	<!-- Forwards requests to the "/" resource to the "welcome" view -->
-	<mvc:view-controller path="/" view-name="welcome" />
+	<!-- Forwards requests to the "/" resource to the "index" view -->
+	<mvc:view-controller path="/" view-name="index" />
 
     
 	<!-- Saves a locale change using a cookie -->

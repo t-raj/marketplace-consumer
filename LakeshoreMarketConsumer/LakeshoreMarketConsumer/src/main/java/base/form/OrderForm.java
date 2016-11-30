@@ -1,8 +1,9 @@
-package form;
+package base.form;
 
 import java.util.List;
 
-import bean.OrderTO;
+import base.bean.OrderTO;
+
 
 public class OrderForm {
 	
