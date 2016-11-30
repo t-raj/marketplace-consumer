@@ -6,8 +6,6 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import constant.Constant;
+import jaxb.Partner;
 
 @Controller
 public class AbstractController {
@@ -32,18 +31,21 @@ public class AbstractController {
 		try {
 			HttpSession session = request.getSession();
 
+			Partner partner = sendHTTPGetPartner(20202);
 			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("partnerForm", partner);
 			//			Product
 			//			model.put("productForm", value)
-			return new ModelAndView("home", model);		
+			
+			return new ModelAndView("partner", model);		
 		} catch(Exception e) {
 			e.getMessage();
 			return new ModelAndView("error");
 		}
 	}
 
-	private ResultSet sendHTTPGetPartner(String inputURL, int partnerId) throws IOException, JAXBException{
-		ResultSet user = null;
+	private Partner sendHTTPGetPartner(int partnerId) throws IOException, JAXBException {
+		Partner user = null;
 		URL url = new URL(Constant.BASE_URL+ "/partners/"+ partnerId);
 		HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
@@ -68,28 +70,11 @@ public class AbstractController {
 		bufferReader.close();
 
 		//convert xml file into Java file(ResultSet)
-		try {
-			JAXBContext jaxbContext = JAXBContext.newInstance(ResultSet.class);
-			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			user = (ResultSet) jaxbUnmarshaller.unmarshal(new StringReader(response.toString()));
+		JAXBContext jaxbContext = JAXBContext.newInstance(Partner.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		user = (Partner) jaxbUnmarshaller.unmarshal(new StringReader(response.toString()));
 
-			while(user.next()){
-				String firstName = user.getString("firstName");
-				String lastName = user.getString("lastName");
-				String streetAdd = user.getString("streetAddress");
-				String city = user.getString("city");
-				String state = user.getString("state");
-				int zip = user.getInt("zip_code");
 
-				System.out.println("partner with Id: "+ partnerId + "\t" + "first Name: "+firstName+
-						"\t"+ "last Name: "+lastName +"\t"+ "Street Address: "+streetAdd+
-						"\t"+ "city: " + city + "\t" + "state: " + state
-						);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
 		return user;
 	}
 }
