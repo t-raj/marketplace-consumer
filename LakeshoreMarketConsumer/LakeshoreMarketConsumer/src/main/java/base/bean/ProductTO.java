@@ -8,6 +8,7 @@ public class ProductTO {
 	private int numAvailable;
 	private int price;
 	private boolean active;
+	private String link;
 	
 	public int getId() {
 		return id;
@@ -44,6 +45,12 @@ public class ProductTO {
 	}
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+	public String getLink() {
+		return link;
+	}
+	public void setLink(String link) {
+		this.link = link;
 	}
 
 

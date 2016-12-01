@@ -11,7 +11,8 @@ public class PartnerTO {
 	private String city;
 	private String state;
 	private int zip_code;
-
+	private String link;
+	
 	public int getId() {
 		return id;
 	}
@@ -65,6 +66,12 @@ public class PartnerTO {
 	}
 	public void setZip_code(int zip_code) {
 		this.zip_code = zip_code;
+	}
+	public String getLink() {
+		return link;
+	}
+	public void setLink(String link) {
+		this.link = link;
 	}
 
 }

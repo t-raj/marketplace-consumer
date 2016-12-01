@@ -13,37 +13,45 @@
 <body>
 Search products:
 
-<!-- form to get products -->
-
-<form action="products">
+<!-- form to search for products -->
+<form action="products" method='POST'>
   Please enter the product number to find a product:
   <input type="text" name="productNumber" value="" /><br/>    
   <input type="submit" value="Search"/>  
 	
 </form>
 
-<!-- dynamic links -->
-		<form:form method="POST" action="submitSurvey.do" modelAttribute="partnerForm">
-
-<table class="tablesorter">
-		
+<!-- search results are below -->
+<form:form method="POST" action="" modelAttribute="productForm">
+    <table class="tablesorter">
 			<thead class="thfloat textbold">
 			    <tr>
-			    	<th></th>
-			    	<th></th>			
+			    	<th>Number</th>
+			    	<th>Product Id</th>			
+			    	<th>Product Description</th>
+			    	<th>Action</th>			
 			    </tr>
 		    </thead>
 			<tbody class="texttd">
-			    <c:forEach items="${partnerForm.partnerTOList}" var="partnerTO" varStatus="status">
+			    <c:forEach items="${productForm.productTOList}" var="productTO" varStatus="status">
 			        <tr>
-			            <td><input type="hidden" name="partnerTOList[${status.index}].id" value="${partnerTO.id}"/></td> 			           
+			            <td><input type="hidden" name="productTOList[${status.index}].id" value="${productTO.id}"/></td> 			           
 			            <td>
-			            	${partnerTO.id}) ${partnerTO.lastName}<br>
+			            	${productTO.id} 
+			            </td>
+			            <td>
+			            	${productTO.description}
+			            </td>
+			            <td>
+			            	<!-- Link will include action to buy the product -->
+			                ${productTO.link}
 			            </td>
 			       </tr>
 			    </c:forEach>
 		    </tbody>
 		</table>
 </form:form>
+
 </body>
+
 </html>
