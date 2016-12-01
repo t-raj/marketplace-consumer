@@ -29,13 +29,11 @@ public class CustomerController {
 	}
 	
 	@RequestMapping(value = "/register")
-	public ModelAndView register(@RequestParam("login") String login, @RequestParam("password") String password, 
+	public ModelAndView register(@RequestParam("id") String id, @RequestParam("login") String login, @RequestParam("password") String password, 
 			@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("streetAddress") String streetAddress, 
 			@RequestParam("city") String city,  @RequestParam("state") String state, @RequestParam("zip") String zip) {
 		try {
-			// create a new customer pojo that will be marshalled into an xml
-			//TODO
-//			lakeshoreServiceManager.register(login, password, firstName, lastName, streetAddress, city, state, zip);
+			lakeshoreServiceManager.registerCustomer(id, login, password, firstName, lastName, streetAddress, city, state, zip);
 			// return the customer info at the top of the page 
 			return new ModelAndView("customer", null);		
 		} catch(Exception e) {

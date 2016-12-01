@@ -23,13 +23,12 @@ public class ProductController {
 	@RequestMapping(value = "/products", method = RequestMethod.POST)
 	public ModelAndView find(@RequestParam("productNumber") String productNumber) {
 		try {
-			int productNum = Integer.parseInt(productNumber);
-			Product product = lakeshoreServiceManager.getProduct(productNum);
+			Product product = lakeshoreServiceManager.getProduct(Integer.parseInt(productNumber));
 			ProductForm productForm = LakeshoreMarketUtil.buildProductForm(product);
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("productForm", productForm);
 			
-			// redirect to product page with product data 
+			// redirect to customer page with product data 
 			return new ModelAndView("customer", model);		
 		} catch(Exception e) {
 			e.getMessage();
@@ -43,10 +42,7 @@ public class ProductController {
 			@RequestParam("description") String description, @RequestParam("partner") String partner, 
 			@RequestParam("price") String price) {
 		try {
-			int productNum = Integer.parseInt(productNumber);
-			//TODO: create a product pojo to be marshalled and sent as the request body  
-			lakeshoreServiceManager.addProduct(productNum, description, partner, price);
-			
+			lakeshoreServiceManager.addProduct(Integer.parseInt(productNumber), description, partner, price);
 			return new ModelAndView("partner", null);		
 		} catch(Exception e) {
 			e.getMessage();

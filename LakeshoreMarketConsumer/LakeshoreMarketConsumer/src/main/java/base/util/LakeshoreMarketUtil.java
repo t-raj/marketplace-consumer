@@ -3,10 +3,17 @@ package base.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import base.bean.PartnerTO;
 import base.bean.ProductTO;
@@ -14,6 +21,7 @@ import base.constant.Constant;
 import base.constant.HTTPVerb;
 import base.form.PartnerForm;
 import base.form.ProductForm;
+import base.jaxb.Customer;
 import base.jaxb.Partner;
 import base.jaxb.Product;
 
@@ -72,7 +80,7 @@ public class LakeshoreMarketUtil {
 			productTO.setId(product.getPId());
 			productTO.setPrice(product.getPrice());
 			productTO.setNumAvailable(product.getNumberAvailable());
-			//TODO: product.getDescription
+			productTO.setDescription(product.getDescription());
 		}
 		return productTO;
 	}
@@ -88,7 +96,7 @@ public class LakeshoreMarketUtil {
 		return partnerForm;
 	}
 
-	public static void sendHTTPRequestBody(HTTPVerb httpVerb, String relativePath, Product product) throws IOException {
+	public static void sendHTTPRequestBody(HTTPVerb httpVerb, String relativePath, String body) throws IOException {
 		URL url = new URL(Constant.BASE_URL + relativePath);
 		HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
@@ -96,8 +104,10 @@ public class LakeshoreMarketUtil {
 			urlConnection.setRequestMethod(httpVerb.toString());
 			urlConnection.setRequestProperty("Content-type", Constant.MEDIA_TYPE_XML);
 			urlConnection.setDoOutput(true);
-//			TODO: use marshaller to build to xml instead of doing it manually 
-//			HttpPost httppost = new HttpPost(url);
+			urlConnection.setDoInput(true);
+			
+			
+//			HttpPost httppst = new HttpPost(url);
 //			InputStream inputStream=new ByteArrayInputStream(xmlString.getBytes());//init your own inputstream
 //			InputStreamEntity inputStreamEntity=new InputStreamEntity(inputStream,xmlString.getBytes());
 //			httppost.setEntity(inputStreamEntity);
@@ -135,40 +145,96 @@ public class LakeshoreMarketUtil {
 
 	}
 
-	private static String buildXML(Product product) {
-		if (product == null) {
-			return null;
-		}
+//	public static String buildXML(Product product) {
+//		if (product == null) {
+//			return null;
+//		}
+//
+//		StringBuilder xml = new StringBuilder();
+//		/*
+//		 * <Product>
+//   			 <pId>0</pId>
+//   			 <price>0</price>
+//   			 <partnerId>0</partnerId>
+//   			 <numberAvailable>0</numberAvailable>
+//		   </Product>
+//		 */
+//		xml.append("<Product>");
+//		xml.append("<pId>");
+//		xml.append(product.getPartnerId());
+//		xml.append("</pId>");
+//
+//		xml.append("<price>");
+//		xml.append(product.getPrice());
+//		xml.append("</price>");
+//
+//		xml.append("<partnerId>");
+//		xml.append(product.getPartnerId());
+//		xml.append("</partnerId>");
+//
+//		xml.append("<numberAvailable>");
+//		xml.append(product.getNumberAvailable());
+//		xml.append("</numberAvailable>");
+//
+//		xml.append("</Product>");
+//		
+//		return xml.toString();
+//	}
+//	
+	/**
+	 * Convert xml string into Java object Partner
+	 * @param response
+	 * @return
+	 * @throws JAXBException
+	 */
+	public final static Partner unmarshalPartner(String response) throws JAXBException {
+		JAXBContext jaxbContext = JAXBContext.newInstance(Partner.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		return (Partner) jaxbUnmarshaller.unmarshal(new StringReader(response));
+	}
+	
+	/**
+	 * Convert xml string into Java object Customer
+	 * @param response
+	 * @return
+	 * @throws JAXBException
+	 */
+	public final static Customer unmarshalCustomer(String response) throws JAXBException {
+		JAXBContext jaxbContext = JAXBContext.newInstance(Customer.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		return (Customer) jaxbUnmarshaller.unmarshal(new StringReader(response));
+	}
 
-		StringBuilder xml = new StringBuilder();
-		/*
-		 * <Product>
-   			 <pId>0</pId>
-   			 <price>0</price>
-   			 <partnerId>0</partnerId>
-   			 <numberAvailable>0</numberAvailable>
-		   </Product>
-		 */
-		xml.append("<Product>");
-		xml.append("<pId>");
-		xml.append(product.getPartnerId());
-		xml.append("</pId>");
+	/**
+	 * Create customer xml 
+	 * @param customer
+	 * @return
+	 * @throws JAXBException 
+	 */
+	public static String buildXML(Customer customer) throws JAXBException {
+		JAXBContext jaxbContext = JAXBContext.newInstance(Customer.class);
+		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+		jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+		java.io.StringWriter sw = new StringWriter();
+		jaxbMarshaller.marshal(customer, sw);
 
-		xml.append("<price>");
-		xml.append(product.getPrice());
-		xml.append("</price>");
+		return sw.toString();
+	}
+	
+	/**
+	 * Create customer xml 
+	 * @param customer
+	 * @return
+	 * @throws JAXBException 
+	 */
+	public static String buildXML(Product product) throws JAXBException {
+		JAXBContext jaxbContext = JAXBContext.newInstance(Product.class);
+		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+		jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+		java.io.StringWriter sw = new StringWriter();
+		jaxbMarshaller.marshal(product, sw);
 
-		xml.append("<partnerId>");
-		xml.append(product.getPartnerId());
-		xml.append("</partnerId>");
-
-		xml.append("<numberAvailable>");
-		xml.append(product.getNumberAvailable());
-		xml.append("</numberAvailable>");
-
-		xml.append("</Product>");
-		
-		return xml.toString();
+		return sw.toString();
 	}
 
 
