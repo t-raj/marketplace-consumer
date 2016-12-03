@@ -39,7 +39,7 @@ public class CustomerController {
 		}
 	}
 	
-	@RequestMapping(value = "/register")
+	@RequestMapping(value = "/registerCustomer")
 	public ModelAndView register(@RequestParam("id") String id, @RequestParam("login") String login, @RequestParam("password") String password, 
 			@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("streetAddress") String streetAddress, 
 			@RequestParam("city") String city,  @RequestParam("state") String state, @RequestParam("zip") String zip) {

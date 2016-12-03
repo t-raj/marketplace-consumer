@@ -33,6 +33,7 @@ function submitForm() {
   Please enter the product number:  <input type="text" name="productNumber" value="" /><br/>    
   Please enter the product description:  <input type="text" name="description" value="" /><br/>    
   Please enter the product price:  <input type="text" name="price" value="" /><br/>    
+  Please enter the partner:  <input type="text" name="partner" value="" /><br/>    
   
   <input type="submit" value="Add"/>  
  </form>

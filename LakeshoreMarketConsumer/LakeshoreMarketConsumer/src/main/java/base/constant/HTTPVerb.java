@@ -2,5 +2,5 @@ package base.constant;
 
 public enum HTTPVerb {
 
-	GET, POST;
+	GET, POST, PUT;
 }

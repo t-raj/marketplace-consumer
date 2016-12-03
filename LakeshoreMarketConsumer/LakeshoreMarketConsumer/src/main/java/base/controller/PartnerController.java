@@ -19,7 +19,6 @@ import base.form.ProductForm;
 import base.jaxb.Orders;
 import base.jaxb.Partner;
 import base.jaxb.Product;
-import base.jaxb.Products;
 import base.util.LakeshoreMarketUtil;
 
 /**
@@ -146,14 +145,14 @@ public class PartnerController {
 	@RequestMapping(value = "/addProductForm", method = RequestMethod.POST)
 	public ModelAndView add(@RequestParam("productNumber") String productNumber, 
 			@RequestParam("description") String description, 
-			@RequestParam("price") String price) {
+			@RequestParam("price") String price, @RequestParam("partner") int partner) {
 		try {
-			lakeshoreServiceManager.addProduct(Integer.parseInt(productNumber), description, partnerID, Integer.parseInt(price));
+			lakeshoreServiceManager.addProduct(Integer.parseInt(productNumber), description, partner, Integer.parseInt(price));
 			// show all products for the partner
-			Products products = lakeshoreServiceManager.getProducts(partnerID);
-			ProductForm productForm = LakeshoreMarketUtil.buildProductForm(products);
+//			Products products = lakeshoreServiceManager.getProducts(partner);
+//			ProductForm productForm = LakeshoreMarketUtil.buildProductForm(products);
 			Map<String, Object> model = new HashMap<String, Object>();
-			model.put("productForm", productForm);
+//			model.put("productForm", productForm);
 			model.put("partnerForm", partnerForm);
 			
 			return new ModelAndView("partner", model);		

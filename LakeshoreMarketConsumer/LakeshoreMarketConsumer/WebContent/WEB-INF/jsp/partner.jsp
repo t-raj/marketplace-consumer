@@ -26,7 +26,7 @@ function submitForm() {
  -->
  <br/>
  
- <a href="/" >Logout</a>
+ <a href="/LakeshoreMarketConsumer" >Logout</a>
  <br/>
  
 <!-- partner info with links to actions --> 			
