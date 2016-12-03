@@ -1,5 +1,7 @@
 package base.bean;
 
+import java.util.List;
+
 public class ProductTO {
 	
 	private int id;
@@ -8,7 +10,7 @@ public class ProductTO {
 	private int numAvailable;
 	private int price;
 	private boolean active;
-	private String link;
+	private List<LinkTO> links;
 	
 	public int getId() {
 		return id;
@@ -46,12 +48,11 @@ public class ProductTO {
 	public void setActive(boolean active) {
 		this.active = active;
 	}
-	public String getLink() {
-		return link;
+	public List<LinkTO> getLinks() {
+		return links;
 	}
-	public void setLink(String link) {
-		this.link = link;
+	public void setLinks(List<LinkTO> links) {
+		this.links = links;
 	}
-
 
 }

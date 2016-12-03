@@ -13,11 +13,11 @@ public interface LakeshoreServiceManager {
 
 	Product getProduct(int productNumber) throws IOException, JAXBException;
 
-	void addProduct(int productNum, String description, String partner, String price) throws IOException, JAXBException;
+	void addProduct(int productNum, String description, int partnerId, int price) throws IOException, JAXBException;
 
 	boolean isValidCustomer(String login, String password) throws JAXBException, IOException;
 	
-	boolean isValidPartner(String login, String password) throws IOException, JAXBException;
+	Partner isValidPartner(String login, String password) throws IOException, JAXBException;
 
 	void registerCustomer(String id, String login, String password, String firstName, String lastName,
 			String streetAddress, String city, String state, String zip) throws JAXBException, IOException;

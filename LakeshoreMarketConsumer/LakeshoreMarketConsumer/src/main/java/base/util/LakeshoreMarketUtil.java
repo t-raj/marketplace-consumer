@@ -3,6 +3,7 @@ package base.util;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
@@ -15,6 +16,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import base.bean.LinkTO;
 import base.bean.PartnerTO;
 import base.bean.ProductTO;
 import base.constant.Constant;
@@ -24,6 +26,7 @@ import base.form.ProductForm;
 import base.jaxb.Customer;
 import base.jaxb.Partner;
 import base.jaxb.Product;
+import base.jaxb.Product.Link;
 
 public class LakeshoreMarketUtil {
 
@@ -37,14 +40,22 @@ public class LakeshoreMarketUtil {
 		return partnerTO;
 	}
 
-	public static final String sendHTTPRequest(HTTPVerb httpVerb, String relativePath) throws IOException {
+	public static String sendHTTPRequest(HTTPVerb httpVerb, String relativePath, String body) throws IOException {
 		URL url = new URL(Constant.BASE_URL + relativePath);
 		HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
 		try { 
 			urlConnection.setRequestMethod(httpVerb.toString());
 			urlConnection.setRequestProperty("Accept", Constant.MEDIA_TYPE_XML);
-
+			urlConnection.setRequestProperty("Content-type", Constant.MEDIA_TYPE_XML);
+			
+			if (body != null && !body.isEmpty()) {
+				urlConnection.setDoOutput(true);
+				OutputStream os = urlConnection.getOutputStream();
+				os.write(body.getBytes("UTF-8"));
+				os.close();
+			}
+	
 			if(urlConnection.getResponseCode() != Constant.HTTP_RESPONSE_SUCCESS){
 				throw new RuntimeException("Failed : HTTP error code : " + urlConnection.getResponseCode());
 			}
@@ -60,7 +71,7 @@ public class LakeshoreMarketUtil {
 			response.append(inputLine);
 		}
 		bufferReader.close();
-
+		
 		return response.toString();
 	}
 
@@ -77,12 +88,31 @@ public class LakeshoreMarketUtil {
 	private static ProductTO buildProductTO(Product product) {
 		ProductTO productTO = new ProductTO();
 		if (product != null) {
-			productTO.setId(product.getPId());
+			productTO.setId(product.getProductId());
 			productTO.setPrice(product.getPrice());
 			productTO.setNumAvailable(product.getNumberAvailable());
 			productTO.setDescription(product.getDescription());
+			productTO.setLinks(buildLinkTOList(product.getLink()));
 		}
 		return productTO;
+	}
+
+	private static List<LinkTO> buildLinkTOList(List<Link> links) {
+		if (links == null || links.isEmpty()) {
+			return null;
+		}
+		
+		List<LinkTO> linkTOs = new ArrayList<LinkTO>();
+		for (Link link : links) {
+			LinkTO linkTO = new LinkTO();
+			linkTO.setAction(link.getAction());
+			linkTO.setMediaType(link.getMediaType());
+			linkTO.setRel(link.getRel());
+			linkTO.setUrl(link.getUrl());
+			linkTOs.add(linkTO);
+		}
+		
+		return linkTOs;
 	}
 
 	public static PartnerForm buildPartnerForm(Partner partner) {
@@ -96,91 +126,7 @@ public class LakeshoreMarketUtil {
 		return partnerForm;
 	}
 
-	public static void sendHTTPRequestBody(HTTPVerb httpVerb, String relativePath, String body) throws IOException {
-		URL url = new URL(Constant.BASE_URL + relativePath);
-		HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
-		try { 
-			urlConnection.setRequestMethod(httpVerb.toString());
-			urlConnection.setRequestProperty("Content-type", Constant.MEDIA_TYPE_XML);
-			urlConnection.setDoOutput(true);
-			urlConnection.setDoInput(true);
-			
-			
-//			HttpPost httppst = new HttpPost(url);
-//			InputStream inputStream=new ByteArrayInputStream(xmlString.getBytes());//init your own inputstream
-//			InputStreamEntity inputStreamEntity=new InputStreamEntity(inputStream,xmlString.getBytes());
-//			httppost.setEntity(inputStreamEntity);
-//			
-//			OutputStreamWriter writer = null;
-//			try {
-//			    writer = new OutputStreamWriter(urlConnection.getOutputStream(), charset);
-//			    writer.write(query); // Write POST query string (if any needed).
-//			} finally {
-//			    if (writer != null) try { writer.close(); } catch (IOException logOrIgnore) {}
-//			}
-//
-//			InputStream result = urlConnection.getInputStream();
-			// Now do your thing with the result.
-//			OutputStream os = urlConnection.getOutputStream();
-//			String xml = buildXML(product);
-//			os.write(xml.getBytes("UTF-8"));
-//			os.close();
-
-			if(urlConnection.getResponseCode() != Constant.HTTP_RESPONSE_SUCCESS){
-				throw new RuntimeException("Failed : HTTP error code : " + urlConnection.getResponseCode());
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		BufferedReader bufferReader = new BufferedReader(new InputStreamReader((urlConnection.getInputStream())));
-		StringBuffer response = new StringBuffer();
-		String inputLine = null;
-
-		while ((inputLine = bufferReader.readLine()) != null) {
-			response.append(inputLine);
-		}
-		bufferReader.close();
-
-	}
-
-//	public static String buildXML(Product product) {
-//		if (product == null) {
-//			return null;
-//		}
-//
-//		StringBuilder xml = new StringBuilder();
-//		/*
-//		 * <Product>
-//   			 <pId>0</pId>
-//   			 <price>0</price>
-//   			 <partnerId>0</partnerId>
-//   			 <numberAvailable>0</numberAvailable>
-//		   </Product>
-//		 */
-//		xml.append("<Product>");
-//		xml.append("<pId>");
-//		xml.append(product.getPartnerId());
-//		xml.append("</pId>");
-//
-//		xml.append("<price>");
-//		xml.append(product.getPrice());
-//		xml.append("</price>");
-//
-//		xml.append("<partnerId>");
-//		xml.append(product.getPartnerId());
-//		xml.append("</partnerId>");
-//
-//		xml.append("<numberAvailable>");
-//		xml.append(product.getNumberAvailable());
-//		xml.append("</numberAvailable>");
-//
-//		xml.append("</Product>");
-//		
-//		return xml.toString();
-//	}
-//	
 	/**
 	 * Convert xml string into Java object Partner
 	 * @param response

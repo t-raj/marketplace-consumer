@@ -14,7 +14,7 @@
 Search products:
 
 <!-- form to search for products -->
-<form action="products" method='POST'>
+<form action="/LakeshoreMarketConsumer/products" method='POST'>
   Please enter the product number to find a product:
   <input type="text" name="productNumber" value="" /><br/>    
   <input type="submit" value="Search"/>  

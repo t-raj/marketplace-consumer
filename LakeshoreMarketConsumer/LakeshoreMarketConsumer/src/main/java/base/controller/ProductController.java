@@ -20,6 +20,7 @@ public class ProductController {
 
 	private LakeshoreServiceManager lakeshoreServiceManager = new LakeshoreServiceManagerImpl();
 	
+	// the form is submitted when a link is clicked. The link is passed as a ModelAttribute and is used to perform the correct action, e.g. add produc t
 	@RequestMapping(value = "/products", method = RequestMethod.POST)
 	public ModelAndView find(@RequestParam("productNumber") String productNumber) {
 		try {
@@ -42,7 +43,7 @@ public class ProductController {
 			@RequestParam("description") String description, @RequestParam("partner") String partner, 
 			@RequestParam("price") String price) {
 		try {
-			lakeshoreServiceManager.addProduct(Integer.parseInt(productNumber), description, partner, price);
+			lakeshoreServiceManager.addProduct(Integer.parseInt(productNumber), description, Integer.parseInt(partner), Integer.parseInt(price));
 			return new ModelAndView("partner", null);		
 		} catch(Exception e) {
 			e.getMessage();

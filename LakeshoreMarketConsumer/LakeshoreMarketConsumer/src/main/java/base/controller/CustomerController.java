@@ -34,7 +34,6 @@ public class CustomerController {
 			@RequestParam("city") String city,  @RequestParam("state") String state, @RequestParam("zip") String zip) {
 		try {
 			lakeshoreServiceManager.registerCustomer(id, login, password, firstName, lastName, streetAddress, city, state, zip);
-			// return the customer info at the top of the page 
 			return new ModelAndView("customer", null);		
 		} catch(Exception e) {
 			e.getMessage();

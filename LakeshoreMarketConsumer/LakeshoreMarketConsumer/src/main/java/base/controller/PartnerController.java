@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -25,7 +26,6 @@ import base.util.LakeshoreMarketUtil;
 	d. Get acknowledgement of order fulfillment
 
  * @author lbo
- *
  */
 @Controller
 public class PartnerController {
@@ -33,7 +33,29 @@ public class PartnerController {
 	private LakeshoreServiceManager lakeshoreServiceManager = new LakeshoreServiceManagerImpl();
 
 	/**
-	 * Find a partner - test class
+	 * Find a partner
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@RequestMapping(value = "/processRequest")
+	public ModelAndView handleLink(@ModelAttribute("partnerForm")PartnerForm selectedLink, HttpServletRequest request, HttpServletResponse response) {
+		try {
+			Partner partner = lakeshoreServiceManager.getPartner(20202);
+			PartnerForm partnerForm = LakeshoreMarketUtil.buildPartnerForm(partner);
+			// put partnerForm in the model
+			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("partnerForm", partnerForm);
+			
+			return new ModelAndView("partner", model);		
+		} catch(Exception e) {
+			e.getMessage();
+			return new ModelAndView("error");
+		}
+	}
+	
+	/**
+	 * Find a partner
 	 * @param request
 	 * @param response
 	 * @return
@@ -91,14 +113,19 @@ public class PartnerController {
 	 * @param password
 	 * @return
 	 */
-	@RequestMapping(value = "/loginPartner")
+	@RequestMapping(value = "/partnerLogin")
 	public ModelAndView login(@RequestParam("login") String login, @RequestParam("password") String password) {
 		try {
-			boolean isValid = lakeshoreServiceManager.isValidPartner(login, password);
-			if (isValid) {
-				return new ModelAndView("partner", null);		
+			Partner partner = lakeshoreServiceManager.isValidPartner(login, password);
+			if (partner != null) {
+				PartnerForm partnerForm = LakeshoreMarketUtil.buildPartnerForm(partner);
+				// put partnerForm in the model
+				Map<String, Object> model = new HashMap<String, Object>();
+				model.put("partnerForm", partnerForm);
+				return new ModelAndView("partner", model);		
 			} 
 			
+			// null partner means validation failed 
 			return new ModelAndView("index", null);		
 		} catch(Exception e) {
 			e.getMessage();

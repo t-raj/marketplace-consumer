@@ -24,14 +24,14 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 	@Override
 	public Partner getPartner(int partnerId) throws IOException, JAXBException {
 		String relativePath = "/partners/" + partnerId;
-		return LakeshoreMarketUtil.unmarshalPartner(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath));
+		return LakeshoreMarketUtil.unmarshalPartner(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
 	}
 
 	@Override
 	public Product getProduct(int productNumber) throws IOException, JAXBException {
 		Product product = null;
 		String relativePath = "products/" + productNumber;
-		String response = LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath);
+		String response = LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null);
 
 		//convert xml file into Java file
 		JAXBContext jaxbContext = JAXBContext.newInstance(Product.class);
@@ -42,23 +42,23 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 	}
 
 	@Override
-	public void addProduct(int productNum, String description, String partner, String price) throws IOException, JAXBException {
+	public void addProduct(int productNum, String description, int partnerId, int price) throws IOException, JAXBException {
 		Product product = new Product();
 		product.setNumberAvailable(1);
-		product.setPartnerId(Integer.parseInt(partner));
-		product.setPId(productNum);
+		product.setPartnerId(partnerId);
+		product.setProductId(productNum);
+		product.setPrice(price);
 		product.setDescription(description);
 		String relativePath = "products";
 		String body = LakeshoreMarketUtil.buildXML(product);
-		LakeshoreMarketUtil.sendHTTPRequestBody(HTTPVerb.POST, relativePath, body);
-		
+		LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST, relativePath, body);
 	}
 
 	@Override
 	public boolean isValidCustomer(String login, String password) throws JAXBException, IOException {
 		boolean isValid = false;
 		String relativePath = "/customers/" + login;
-		Customer customer = LakeshoreMarketUtil.unmarshalCustomer(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath));
+		Customer customer = LakeshoreMarketUtil.unmarshalCustomer(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
 		if (customer != null && password.equals(customer.getPassword())) {
 			isValid = true;
 		}
@@ -67,15 +67,15 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 	}
 
 	@Override
-	public boolean isValidPartner(String login, String password) throws IOException, JAXBException {
-		boolean isValid = false;
-		String relativePath = "/partners/" + login;
-		Partner partner = LakeshoreMarketUtil.unmarshalPartner(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath));
+	public Partner isValidPartner(String login, String password) throws IOException, JAXBException {
+		Partner partner = null; //return null if no valid partner
+		String relativePath = "partners/" + login;
+		partner = LakeshoreMarketUtil.unmarshalPartner(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
 		if (partner != null && password.equals(partner.getPassword())) {
-			isValid = true;
+			return partner; // return the partner if there is a match
 		}
 		
-		return isValid;
+		return null;
 	}
 
 	@Override
@@ -95,6 +95,6 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 		customer.setZipCode(Integer.parseInt(zip));
 		String relativePath = "customers";
 		String body = LakeshoreMarketUtil.buildXML(customer);
-		LakeshoreMarketUtil.sendHTTPRequestBody(HTTPVerb.POST, relativePath, body);		
+		LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST, relativePath, body);		
 	}
 }

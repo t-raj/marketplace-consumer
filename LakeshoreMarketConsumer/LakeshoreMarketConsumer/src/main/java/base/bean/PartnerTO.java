@@ -1,5 +1,7 @@
 package base.bean;
 
+import java.util.List;
+
 public class PartnerTO {
 	
 	private int id;
@@ -11,7 +13,7 @@ public class PartnerTO {
 	private String city;
 	private String state;
 	private int zip_code;
-	private String link;
+	private List<LinkTO> linkList;
 	
 	public int getId() {
 		return id;
@@ -67,11 +69,11 @@ public class PartnerTO {
 	public void setZip_code(int zip_code) {
 		this.zip_code = zip_code;
 	}
-	public String getLink() {
-		return link;
+	public List<LinkTO> getLinkList() {
+		return linkList;
 	}
-	public void setLink(String link) {
-		this.link = link;
+	public void setLinkList(List<LinkTO> linkList) {
+		this.linkList = linkList;
 	}
 
 }
