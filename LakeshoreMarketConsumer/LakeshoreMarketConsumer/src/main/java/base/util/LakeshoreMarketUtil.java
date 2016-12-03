@@ -16,14 +16,20 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 
+import base.bean.CustomerTO;
 import base.bean.LinkTO;
+import base.bean.OrderTO;
 import base.bean.PartnerTO;
 import base.bean.ProductTO;
 import base.constant.Constant;
 import base.constant.HTTPVerb;
+import base.form.CustomerForm;
+import base.form.OrderForm;
 import base.form.PartnerForm;
 import base.form.ProductForm;
 import base.jaxb.Customer;
+import base.jaxb.Order;
+import base.jaxb.Orders;
 import base.jaxb.Partner;
 import base.jaxb.Product;
 import base.jaxb.Product.Link;
@@ -36,6 +42,22 @@ public class LakeshoreMarketUtil {
 			partnerTO.setId(partner.getId());
 			partnerTO.setFirstName(partner.getLogin());
 			partnerTO.setLastName(partner.getLastName());
+			partnerTO.setLogin(partner.getLogin());
+			partnerTO.setPassword(partner.getPassword());
+			partnerTO.setStreetAddress(partner.getStreetAddress());
+			partnerTO.setState(partner.getState());
+			partnerTO.setZip_code(partner.getZipCode());
+			// deep clone of list array
+			List<LinkTO> links = new ArrayList<LinkTO>();
+			for (Partner.Link link : partner.getLink()) {
+				LinkTO linkTO = new LinkTO();
+				linkTO.setAction(link.getAction());
+				linkTO.setMediaType(link.getMediaType());
+				linkTO.setRel(link.getRel());
+				linkTO.setUrl(link.getUrl());
+				links.add(linkTO);
+			}
+			partnerTO.setLinkList(links);
 		}
 		return partnerTO;
 	}
@@ -97,13 +119,31 @@ public class LakeshoreMarketUtil {
 		return productTO;
 	}
 
-	private static List<LinkTO> buildLinkTOList(List<Link> links) {
+	public static List<LinkTO> buildLinkTOList(List<Link> links) {
 		if (links == null || links.isEmpty()) {
 			return null;
 		}
 		
 		List<LinkTO> linkTOs = new ArrayList<LinkTO>();
 		for (Link link : links) {
+			LinkTO linkTO = new LinkTO();
+			linkTO.setAction(link.getAction());
+			linkTO.setMediaType(link.getMediaType());
+			linkTO.setRel(link.getRel());
+			linkTO.setUrl(link.getUrl());
+			linkTOs.add(linkTO);
+		}
+		
+		return linkTOs;
+	}
+
+	public static List<LinkTO> buildLinkTOListFromPartner(List<Partner.Link> links) {
+		if (links == null || links.isEmpty()) {
+			return null;
+		}
+		
+		List<LinkTO> linkTOs = new ArrayList<LinkTO>();
+		for (Partner.Link link : links) {
 			LinkTO linkTO = new LinkTO();
 			linkTO.setAction(link.getAction());
 			linkTO.setMediaType(link.getMediaType());
@@ -182,6 +222,111 @@ public class LakeshoreMarketUtil {
 
 		return sw.toString();
 	}
+
+	/**
+	 * Create partner xml
+	 * @param partner
+	 * @return
+	 * @throws JAXBException 
+	 */
+	public static String buildXML(Partner partner) throws JAXBException {
+		JAXBContext jaxbContext = JAXBContext.newInstance(Partner.class);
+		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+		jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+		java.io.StringWriter sw = new StringWriter();
+		jaxbMarshaller.marshal(partner, sw);
+
+		return sw.toString();
+	}
+
+	public static Product unmarshalProduct(String response) throws JAXBException {
+		//convert xml file into Java file
+		JAXBContext jaxbContext = JAXBContext.newInstance(Product.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		return (Product) jaxbUnmarshaller.unmarshal(new StringReader(response));
+	}
+
+	public static CustomerForm buildCustomerForm(Customer customer) {
+		CustomerTO customerTO = buildCustomerTO(customer);
+		List<CustomerTO> customerTOList = new ArrayList<CustomerTO>();
+		customerTOList.add(customerTO);
+		CustomerForm customerForm = new CustomerForm();
+		customerForm.setCustomerTOList(customerTOList);
+
+		return customerForm;
+	}
+
+	private static CustomerTO buildCustomerTO(Customer customer) {
+		CustomerTO customerTO = new CustomerTO();
+		if (customer != null) {
+			customerTO.setId(customer.getId());
+			customerTO.setFirstName(customer.getLogin());
+			customerTO.setLastName(customer.getLastName());
+			customerTO.setLogin(customer.getLogin());
+			customerTO.setPassword(customer.getPassword());
+			customerTO.setStreetAddress(customer.getStreetAddress());
+			customerTO.setState(customer.getState());
+			customerTO.setZip_code(customer.getZipCode());
+			// deep clone of list array
+			List<LinkTO> links = new ArrayList<LinkTO>();
+			for (Customer.Link link : customer.getLink()) {
+				LinkTO linkTO = new LinkTO();
+				linkTO.setAction(link.getAction());
+				linkTO.setMediaType(link.getMediaType());
+				linkTO.setRel(link.getRel());
+				linkTO.setUrl(link.getUrl());
+				links.add(linkTO);
+			}
+			customerTO.setLinkList(links);
+		}
+		return customerTO;
+	}
+
+	public static OrderForm buildOrderForm(List<Order> pushedOrders) {
+		List<OrderTO> orderTOList = new ArrayList<OrderTO>();
+		for (Order pushedOrder : pushedOrders) {
+			OrderTO orderTO = buildOrderTO(pushedOrder);
+			orderTOList.add(orderTO);
+		}
+		
+		OrderForm orderForm = new OrderForm();
+		orderForm.setOrderTOList(orderTOList);
+
+		return orderForm;
+	}
+
+	private static OrderTO buildOrderTO(Order pushedOrder) {
+		OrderTO orderTO = new OrderTO();
+		if (pushedOrder != null) {
+			orderTO.setCustomerId(pushedOrder.getCustomerId());
+			orderTO.setId(pushedOrder.getOrderId());
+			orderTO.setPartnerId(pushedOrder.getPartnerId());
+			// deep clone of list array
+			List<LinkTO> links = new ArrayList<LinkTO>();
+			for (Order.Link link : pushedOrder.getLink()) {
+				LinkTO linkTO = new LinkTO();
+				linkTO.setAction(link.getAction());
+				linkTO.setMediaType(link.getMediaType());
+				linkTO.setRel(link.getRel());
+				linkTO.setUrl(link.getUrl());
+				links.add(linkTO);
+			}
+			orderTO.setLinks(links);
+			// TODO: allow multiple products in pushed order 
+			List<Integer> products = new ArrayList<Integer>();
+			products.add(pushedOrder.getPartnerId());
+			orderTO.setProductIds(products);
+		}
+		return orderTO;
+	}
+
+	public static Orders unmarshalOrder(String response) throws JAXBException {
+		//convert xml file into Java file
+		JAXBContext jaxbContext = JAXBContext.newInstance(Order.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		return (Orders) jaxbUnmarshaller.unmarshal(new StringReader(response));
+	}
+
 
 
 }

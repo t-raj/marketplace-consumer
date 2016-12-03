@@ -2,8 +2,8 @@ package base.bean;
 
 import java.util.List;
 
-public class PartnerTO {
-	
+public class CustomerTO {
+
 	private int id;
 	private String login;
 	private String password;
@@ -14,7 +14,6 @@ public class PartnerTO {
 	private String state;
 	private int zip_code;
 	private List<LinkTO> linkList;
-	
 	public int getId() {
 		return id;
 	}
@@ -75,5 +74,6 @@ public class PartnerTO {
 	public void setLinkList(List<LinkTO> linkList) {
 		this.linkList = linkList;
 	}
-
+	
+	
 }

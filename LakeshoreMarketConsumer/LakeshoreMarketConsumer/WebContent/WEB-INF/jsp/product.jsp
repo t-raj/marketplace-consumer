@@ -54,6 +54,16 @@ function submitForm() {
 		</table>
 </form:form> 
 
+<!-- form to add products  -->
+<form method="POST" action="/LakeshoreMarketConsumer/addProductForm">
+<h4>Add Product</h4>
+  Please enter the product number:  <input type="text" name="productNumber" value="" /><br/>    
+  Please enter the product description:  <input type="text" name="description" value="" /><br/>    
+  Please enter the product partner:  <input type="text" name="partner" value="" /><br/>    
+  Please enter the product price:  <input type="text" name="price" value="" /><br/>    
+  
+  <input type="submit" value="Add"/>  
+ </form>
 
 </body>
 </html>

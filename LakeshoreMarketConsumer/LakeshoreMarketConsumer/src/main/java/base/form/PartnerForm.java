@@ -2,14 +2,13 @@ package base.form;
 
 import java.util.List;
 
-import base.bean.LinkTO;
 import base.bean.PartnerTO;
 
 
 public class PartnerForm {
 
 	private List<PartnerTO> partnerTOList;
-	private LinkTO selectedLink;
+	private String selectedLink;
 	
 	public List<PartnerTO> getPartnerTOList() {
 		return partnerTOList;
@@ -19,15 +18,14 @@ public class PartnerForm {
 		this.partnerTOList = partnerTOList;
 	}
 
-	public LinkTO getSelectedLink() {
+	public String getSelectedLink() {
 		return selectedLink;
 	}
 
-	public void setSelectedLink(LinkTO selectedLink) {
+	public void setSelectedLink(String selectedLink) {
 		this.selectedLink = selectedLink;
 	}
-	
-	
+
 	
 	
 }

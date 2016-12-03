@@ -1,5 +1,8 @@
 package base.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -7,6 +10,9 @@ import org.springframework.web.servlet.ModelAndView;
 
 import base.bo.LakeshoreServiceManager;
 import base.bo.impl.LakeshoreServiceManagerImpl;
+import base.form.CustomerForm;
+import base.jaxb.Customer;
+import base.util.LakeshoreMarketUtil;
 
 @Controller
 public class CustomerController {
@@ -16,9 +22,14 @@ public class CustomerController {
 	@RequestMapping(value = "/login")
 	public ModelAndView authenticate(@RequestParam("login") String login, @RequestParam("password") String password) {
 		try {
-			boolean isValid = lakeshoreServiceManager.isValidCustomer(login, password);
-			if (isValid) {
-				return new ModelAndView("customer", null);		
+			Customer customer = lakeshoreServiceManager.getCustomer(login);
+			if (customer != null && password != null && password.equals(customer.getPassword())) {
+				CustomerForm customerForm = LakeshoreMarketUtil.buildCustomerForm(customer);
+				// put partnerForm in the model
+				Map<String, Object> model = new HashMap<String, Object>();
+				model.put("customerForm", customerForm);
+		
+				return new ModelAndView("customer", model);		
 			} 
 			
 			return new ModelAndView("index", null);		

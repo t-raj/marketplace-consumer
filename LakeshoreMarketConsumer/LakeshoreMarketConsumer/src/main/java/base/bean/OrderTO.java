@@ -9,7 +9,7 @@ public class OrderTO {
 	private int customerId;
 	private List<Integer> productIds;
 	private String status;
-	private String link;
+	private List<LinkTO> links;
 	
 	public int getId() {
 		return id;
@@ -42,12 +42,11 @@ public class OrderTO {
 	public void setProductIds(List<Integer> productIds) {
 		this.productIds = productIds;
 	}
-	public String getLink() {
-		return link;
+	public List<LinkTO> getLinks() {
+		return links;
 	}
-	public void setLink(String link) {
-		this.link = link;
+	public void setLinks(List<LinkTO> links) {
+		this.links = links;
 	}
-	
 
 }
