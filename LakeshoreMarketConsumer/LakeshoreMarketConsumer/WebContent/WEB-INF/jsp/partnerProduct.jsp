@@ -25,41 +25,13 @@ function submitForm() {
 	d. Get acknowledgement of order fulfillment
  -->
 <!-- partner info with links to actions --> 			
-<form:form method="POST" action="processPartnerLink" modelAttribute="partnerForm" id="partnerActionForm">
-<table class="tablesorter">
-			<thead class="thfloat textbold">
-			    <tr>
-			    	<th>Partner Information</th>
-			    	<th>Actions</th>			
-			    </tr>
-		    </thead>
-			<tbody class="texttd">
-			    <c:forEach items="${partnerForm.partnerTOList}" var="partnerTO" varStatus="status">
-			        <tr>
-			            <td>
-			            	${partnerTO.id} ${partnerTO.login}<br>
-			            </td>
-			            <td>
-			                <div>
-				         	    <c:forEach items="${partnerTO.linkList}" var="link" varStatus="status">
-				         	    	<!-- clicking on the link goes to the relative path -->
-					    			<!-- <a href="${link.rel}" onclick="submitForm()"> ${link.action}</a><br>-->
-					    			<a href="${link.rel}"> ${link.action}</a><br> 
-					    		</c:forEach>
-					    	</div>
-						</td>
-			       </tr>
-			    </c:forEach>
-		    </tbody>
-		</table>
-</form:form> 
+<jsp:include page="/WEB-INF/jsp/partner.jsp" />
 
 <!-- form to add products  -->
 <form method="POST" action="/LakeshoreMarketConsumer/addProductForm">
 <h4>Add Product</h4>
   Please enter the product number:  <input type="text" name="productNumber" value="" /><br/>    
   Please enter the product description:  <input type="text" name="description" value="" /><br/>    
-  Please enter the product partner:  <input type="text" name="partner" value="" /><br/>    
   Please enter the product price:  <input type="text" name="price" value="" /><br/>    
   
   <input type="submit" value="Add"/>  

@@ -10,6 +10,7 @@ import base.jaxb.Customer;
 import base.jaxb.Orders;
 import base.jaxb.Partner;
 import base.jaxb.Product;
+import base.jaxb.Products;
 import base.util.LakeshoreMarketUtil;
 
 /**
@@ -26,7 +27,7 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 	}
 
 	@Override
-	public Product addProduct(int productNum, String description, int partnerId, int price) throws IOException, JAXBException {
+	public void addProduct(int productNum, String description, int partnerId, int price) throws IOException, JAXBException {
 		Product product = new Product();
 		product.setNumberAvailable(1);
 		product.setPartnerId(partnerId);
@@ -35,7 +36,7 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 		product.setDescription(description);
 		String relativePath = "products";
 		String body = LakeshoreMarketUtil.buildXML(product);
-		return LakeshoreMarketUtil.unmarshalProduct(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST, relativePath, body));
+		LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST, relativePath, body);
 	}
 
 	@Override
@@ -85,7 +86,7 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 		partner.setState(state);
 		partner.setCity(city);
 		partner.setZipCode(Integer.parseInt(zip));
-		String relativePath = "customers";
+		String relativePath = "partners";
 		String body = LakeshoreMarketUtil.buildXML(partner);
 		String response = LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST, relativePath, body);		
 	
@@ -102,6 +103,12 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 	public Orders getAcknowledgement(int partnerId) throws JAXBException, IOException {
 		String relativePath = "orders/fulfilled/";
 		return LakeshoreMarketUtil.unmarshalOrder(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
+	}
+
+	@Override
+	public Products getProducts(int partnerID) throws JAXBException, IOException {
+		String relativePath = "products/" + partnerID + "/true"; //boolean flag for active products
+		return LakeshoreMarketUtil.unmarshalProducts(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
 	}
 
 }

@@ -33,9 +33,15 @@ import base.jaxb.Orders;
 import base.jaxb.Partner;
 import base.jaxb.Product;
 import base.jaxb.Product.Link;
+import base.jaxb.Products;
 
 public class LakeshoreMarketUtil {
 
+	/**
+	 * 
+	 * @param partner
+	 * @return
+	 */
 	public static final PartnerTO buildPartnerTO(Partner partner) {
 		PartnerTO partnerTO = new PartnerTO();
 		if (partner != null) {
@@ -62,6 +68,14 @@ public class LakeshoreMarketUtil {
 		return partnerTO;
 	}
 
+	/**
+	 * 
+	 * @param httpVerb
+	 * @param relativePath
+	 * @param body
+	 * @return
+	 * @throws IOException
+	 */
 	public static String sendHTTPRequest(HTTPVerb httpVerb, String relativePath, String body) throws IOException {
 		URL url = new URL(Constant.BASE_URL + relativePath);
 		HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
@@ -97,6 +111,11 @@ public class LakeshoreMarketUtil {
 		return response.toString();
 	}
 
+	/**
+	 * 
+	 * @param product
+	 * @return
+	 */
 	public static ProductForm buildProductForm(Product product) {
 		ProductTO productTO = buildProductTO(product);
 		List<ProductTO> productTOList = new ArrayList<ProductTO>();
@@ -119,6 +138,11 @@ public class LakeshoreMarketUtil {
 		return productTO;
 	}
 
+	/**
+	 * 
+	 * @param links
+	 * @return
+	 */
 	public static List<LinkTO> buildLinkTOList(List<Link> links) {
 		if (links == null || links.isEmpty()) {
 			return null;
@@ -137,6 +161,11 @@ public class LakeshoreMarketUtil {
 		return linkTOs;
 	}
 
+	/**
+	 * 
+	 * @param links
+	 * @return
+	 */
 	public static List<LinkTO> buildLinkTOListFromPartner(List<Partner.Link> links) {
 		if (links == null || links.isEmpty()) {
 			return null;
@@ -155,6 +184,11 @@ public class LakeshoreMarketUtil {
 		return linkTOs;
 	}
 
+	/**
+	 * 
+	 * @param partner
+	 * @return
+	 */
 	public static PartnerForm buildPartnerForm(Partner partner) {
 		PartnerTO partnerTO = buildPartnerTO(partner);
 		// add partnerTO to list of partnerTo in partnerForm
@@ -239,6 +273,12 @@ public class LakeshoreMarketUtil {
 		return sw.toString();
 	}
 
+	/**
+	 * 
+	 * @param response
+	 * @return
+	 * @throws JAXBException
+	 */
 	public static Product unmarshalProduct(String response) throws JAXBException {
 		//convert xml file into Java file
 		JAXBContext jaxbContext = JAXBContext.newInstance(Product.class);
@@ -246,6 +286,11 @@ public class LakeshoreMarketUtil {
 		return (Product) jaxbUnmarshaller.unmarshal(new StringReader(response));
 	}
 
+	/**
+	 * 
+	 * @param customer
+	 * @return
+	 */
 	public static CustomerForm buildCustomerForm(Customer customer) {
 		CustomerTO customerTO = buildCustomerTO(customer);
 		List<CustomerTO> customerTOList = new ArrayList<CustomerTO>();
@@ -282,6 +327,11 @@ public class LakeshoreMarketUtil {
 		return customerTO;
 	}
 
+	/**
+	 * 
+	 * @param pushedOrders
+	 * @return
+	 */
 	public static OrderForm buildOrderForm(List<Order> pushedOrders) {
 		List<OrderTO> orderTOList = new ArrayList<OrderTO>();
 		for (Order pushedOrder : pushedOrders) {
@@ -320,11 +370,41 @@ public class LakeshoreMarketUtil {
 		return orderTO;
 	}
 
+	/**
+	 * 
+	 * @param response
+	 * @return
+	 * @throws JAXBException
+	 */
 	public static Orders unmarshalOrder(String response) throws JAXBException {
 		//convert xml file into Java file
 		JAXBContext jaxbContext = JAXBContext.newInstance(Order.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		return (Orders) jaxbUnmarshaller.unmarshal(new StringReader(response));
+	}
+
+	public static ProductForm buildProductForm(Products productList) {
+		ProductForm productForm = new ProductForm();
+
+		if (productList != null) {
+			List<Product> products = productList.getProducts();
+			List<ProductTO> productTOList = new ArrayList<ProductTO>();
+			for (Product product : products) {
+				ProductTO productTO = buildProductTO(product);
+				productTOList.add(productTO);
+			}
+			
+			productForm.setProductTOList(productTOList);
+		}
+
+		return productForm;
+	}
+
+	public static Products unmarshalProducts(String response) throws JAXBException {
+		//convert xml file into Java file
+		JAXBContext jaxbContext = JAXBContext.newInstance(Product.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		return (Products) jaxbUnmarshaller.unmarshal(new StringReader(response));
 	}
 
 

@@ -24,38 +24,27 @@ function submitForm() {
 	c. Push orders that customers made to partners
 	d. Get acknowledgement of order fulfillment
  -->
- <br/>
- 
- <a href="/" >Logout</a>
- <br/>
- 
 <!-- partner info with links to actions --> 			
-<form:form method="POST" action="processPartnerLink" modelAttribute="partnerForm" id="partnerActionForm">
+<jsp:include page="partner.jsp" />
+
+<form:form method="POST" action="" modelAttribute="orderForm">
 <table class="tablesorter">
 			<thead class="thfloat textbold">
-				<tr>
-				   <th>Partner Information</th>
-				</tr>
 			    <tr>
-			    	<th>Id</th>
-			    	<th>Login</th>
+			    	<th>Order Number</th>
 			    	<th>Actions</th>			
 			    </tr>
 		    </thead>
 			<tbody class="texttd">
-			    <c:forEach items="${partnerForm.partnerTOList}" var="partnerTO" varStatus="status">
+			    <c:forEach items="${orderForm.orderTOList}" var="orderTO" varStatus="status">
 			        <tr>
-			        	<td>
-			        	   	${partnerTO.id} <br/>
-			        	</td>
 			            <td>
-							${partnerTO.login} <br/>
+			            	${orderTO.id} <br>
 			            </td>
 			            <td>
 			                <div>
-				         	    <c:forEach items="${partnerTO.linkList}" var="link" varStatus="status">
+				         	    <c:forEach items="${orderTO.linkList}" var="link" varStatus="status">
 				         	    	<!-- clicking on the link goes to the relative path -->
-					    			<!-- <a href="${link.rel}" onclick="submitForm()"> ${link.action}</a><br>-->
 					    			<a href="${link.rel}"> ${link.action}</a><br> 
 					    		</c:forEach>
 					    	</div>
@@ -65,8 +54,6 @@ function submitForm() {
 		    </tbody>
 		</table>
 </form:form> 
-
-
 
 
 </body>

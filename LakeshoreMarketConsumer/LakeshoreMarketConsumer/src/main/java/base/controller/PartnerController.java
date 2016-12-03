@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,6 +19,7 @@ import base.form.ProductForm;
 import base.jaxb.Orders;
 import base.jaxb.Partner;
 import base.jaxb.Product;
+import base.jaxb.Products;
 import base.util.LakeshoreMarketUtil;
 
 /**
@@ -37,6 +37,10 @@ public class PartnerController {
 	private LakeshoreServiceManager lakeshoreServiceManager = new LakeshoreServiceManagerImpl();
 	// update the links for the partner once retrieved so that they can be used when links are clicked
 	private List<LinkTO> partnerLinks;
+	// cache the partner form
+	private PartnerForm partnerForm;
+	// cache the partner id
+	private int partnerID;
 	
 	/**
 	 * Register a partner
@@ -60,6 +64,11 @@ public class PartnerController {
 			partnerLinks = LakeshoreMarketUtil.buildLinkTOListFromPartner(partner.getLink());
 
 			PartnerForm partnerForm = LakeshoreMarketUtil.buildPartnerForm(partner);
+			// cache the partnerform
+			this.partnerForm = partnerForm;
+			// cache the partner id
+			partnerID = id;
+
 			// put partnerForm in the model
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("partnerForm", partnerForm);
@@ -83,6 +92,11 @@ public class PartnerController {
 			if (partner != null && password != null && password.equals(partner.getPassword())) {
 				partnerLinks = LakeshoreMarketUtil.buildLinkTOListFromPartner(partner.getLink());
 				PartnerForm partnerForm = LakeshoreMarketUtil.buildPartnerForm(partner);
+				// cache the partnerform
+				this.partnerForm = partnerForm;
+				// cache the partner id
+				partnerID = partner.getId();
+
 				// put partnerForm in the model
 				Map<String, Object> model = new HashMap<String, Object>();
 				model.put("partnerForm", partnerForm);
@@ -116,13 +130,12 @@ public class PartnerController {
 
 	// 2b. Add product or products in market place
 	@RequestMapping(value = "/addProduct")
-	public ModelAndView showAddProductForm(@ModelAttribute("productForm") ProductForm productForm) {
+	public ModelAndView showAddProductForm() {
 		try {
 			Map<String, Object> model = new HashMap<String, Object>();
-			model.put("productForm", productForm);
+			model.put("partnerForm", partnerForm);
 
-			// show add product form jsp
-			return new ModelAndView("product", model);		
+			return new ModelAndView("partnerProduct", model);		
 		} catch(Exception e) {
 			e.getMessage();
 			return new ModelAndView("error");
@@ -132,14 +145,16 @@ public class PartnerController {
 	// 2b. Add product or products in market place
 	@RequestMapping(value = "/addProductForm", method = RequestMethod.POST)
 	public ModelAndView add(@RequestParam("productNumber") String productNumber, 
-			@RequestParam("description") String description, @RequestParam("partner") String partner, 
+			@RequestParam("description") String description, 
 			@RequestParam("price") String price) {
 		try {
-			Product product = lakeshoreServiceManager.addProduct(Integer.parseInt(productNumber), description, Integer.parseInt(partner), Integer.parseInt(price));
-			// TODO: show all products
-			ProductForm productForm = LakeshoreMarketUtil.buildProductForm(product);
+			lakeshoreServiceManager.addProduct(Integer.parseInt(productNumber), description, partnerID, Integer.parseInt(price));
+			// show all products for the partner
+			Products products = lakeshoreServiceManager.getProducts(partnerID);
+			ProductForm productForm = LakeshoreMarketUtil.buildProductForm(products);
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("productForm", productForm);
+			model.put("partnerForm", partnerForm);
 			
 			return new ModelAndView("partner", model);		
 		} catch(Exception e) {
@@ -149,17 +164,18 @@ public class PartnerController {
 	}
 
 	// 2c. Push orders to partner
-	@RequestMapping(value = "/addProduct")
-	public ModelAndView pushOrdersToPartner(@ModelAttribute("partnerForm") PartnerForm partnerForm) {
+	@RequestMapping(value = "/pushedOrders")
+	public ModelAndView pushOrdersToPartner() {
 		try {
-			Orders pushedOrders = lakeshoreServiceManager.pushOrdersToPartner(partnerForm.getPartnerTOList().get(0).getId());
+			Orders pushedOrders = lakeshoreServiceManager.pushOrdersToPartner(partnerID);
 			// TODO: null check for pushed orders
 			OrderForm orderForm = LakeshoreMarketUtil.buildOrderForm(pushedOrders.getOrders());
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("orderForm", orderForm);
+			model.put("partnerForm", partnerForm);
 
 			// show add product form jsp
-			return new ModelAndView("order", model);		
+			return new ModelAndView("partnerOrder", model);		
 		} catch(Exception e) {
 			e.getMessage();
 			return new ModelAndView("error");
@@ -167,17 +183,18 @@ public class PartnerController {
 	}
 	
 	// 2d. Get acknowledgement of fulfilled orders
-	@RequestMapping(value = "/acknowledgement")
-	public ModelAndView getAcknowledgement(@ModelAttribute("partnerForm") PartnerForm partnerForm) {
+	@RequestMapping(value = "/fulfilledOrders")
+	public ModelAndView getAcknowledgement() {
 		try {
-			Orders fulfilledOrders = lakeshoreServiceManager.getAcknowledgement(partnerForm.getPartnerTOList().get(0).getId());
+			Orders fulfilledOrders = lakeshoreServiceManager.getAcknowledgement(partnerID);
 			// TODO: null check for orders
 			OrderForm orderForm = LakeshoreMarketUtil.buildOrderForm(fulfilledOrders.getOrders());
 			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("partnerForm", partnerForm);
 			model.put("orderForm", orderForm);
 
 			// show add product form jsp
-			return new ModelAndView("order", model);		
+			return new ModelAndView("partnerOrder", model);		
 		} catch(Exception e) {
 			e.getMessage();
 			return new ModelAndView("error");

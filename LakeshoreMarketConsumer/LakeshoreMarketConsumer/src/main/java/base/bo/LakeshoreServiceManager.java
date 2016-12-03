@@ -8,12 +8,13 @@ import base.jaxb.Customer;
 import base.jaxb.Orders;
 import base.jaxb.Partner;
 import base.jaxb.Product;
+import base.jaxb.Products;
 
 public interface LakeshoreServiceManager {
 	
 	Product getProduct(int productNumber) throws IOException, JAXBException;
 
-	Product addProduct(int productNum, String description, int partnerId, int price) throws IOException, JAXBException;
+	void addProduct(int productNum, String description, int partnerId, int price) throws IOException, JAXBException;
 
 	Customer getCustomer(String login) throws JAXBException, IOException;
 	
@@ -28,5 +29,7 @@ public interface LakeshoreServiceManager {
 	Orders pushOrdersToPartner(int partnerId) throws JAXBException, IOException;
 
 	Orders getAcknowledgement(int partnerId) throws JAXBException, IOException;
+
+	Products getProducts(int partnerID) throws JAXBException, IOException;
 
 }
