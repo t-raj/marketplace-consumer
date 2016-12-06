@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+         <!-- XML Schema Generated from XML Document on Mon Dec 05 2016 20:06:29 GMT-0600 (Central Standard Time) -->
+         <!-- with XmlGrid.net Free Online Service http://xmlgrid.net -->
+         <xs:element name="Products">
+               <xs:complexType>
+                     <xs:sequence>
+                           <xs:element name="Product" type="ProductType" minOccurs="0"  maxOccurs="unbounded">
+                           </xs:element>
+                     </xs:sequence>
+               </xs:complexType>
+         </xs:element>
+         
+                      <xs:complexType name="ProductType">
+                                       <xs:sequence>
+                                             <xs:element maxOccurs="unbounded" name="link">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="action" type="xs:string" />
+              <xs:element name="mediaType" type="xs:string" />
+              <xs:element name="rel" type="xs:string" />
+              <xs:element name="url" type="xs:string" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      
+                                             <xs:element name="productId" type="xs:int"></xs:element>
+                                             <xs:element name="description" type="xs:string"></xs:element>
+                                             <xs:element name="price" type="xs:int"></xs:element>
+                                             <xs:element name="partnerId" type="xs:int"></xs:element>
+                                             <xs:element name="numberAvailable" type="xs:int"></xs:element>
+                                       </xs:sequence>
+                                       
+                                 </xs:complexType>
+                    
+   </xs:schema>

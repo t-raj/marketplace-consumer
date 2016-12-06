@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+   <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+         <!-- XML Schema Generated from XML Document on Mon Dec 05 2016 19:57:52 GMT-0600 (Central Standard Time) -->
+         <!-- with XmlGrid.net Free Online Service http://xmlgrid.net -->
+         <xs:element name="Orders">
+               <xs:complexType>
+                     <xs:sequence>
+                            <xs:element name="Order" type="order" minOccurs="0" maxOccurs="unbounded"/>
+                     </xs:sequence>
+               </xs:complexType>
+         </xs:element>
+         
+                                 <xs:complexType name="order">
+                                       <xs:sequence>
+                                             <xs:element name="link" maxOccurs="unbounded" >
+                                                   <xs:complexType>
+                                                         <xs:sequence>
+                                                               <xs:element name="action" type="xs:string"></xs:element>
+                                                               <xs:element name="mediaType" type="xs:string"></xs:element>
+                                                               <xs:element name="rel" type="xs:string"></xs:element>
+                                                               <xs:element name="url" type="xs:string"></xs:element>
+                                                         </xs:sequence>
+                                                   </xs:complexType>
+                                             </xs:element>
+                                             <xs:element name="orderId" type="xs:int"></xs:element>
+                                             <xs:element name="customerId" type="xs:int"></xs:element>
+                                             <xs:element name="partnerId" type="xs:int"></xs:element>
+                                             <xs:element name="status" type="xs:string"></xs:element>
+                                       </xs:sequence>
+                                 </xs:complexType>
+                    
+   </xs:schema>

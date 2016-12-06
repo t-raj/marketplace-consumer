@@ -6,6 +6,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.QueryParam;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,7 +30,7 @@ public class CustomerController {
 	private CustomerForm customerForm;
 	private OrderForm orderForm;
 	private int customerId;
-	
+	private int orderId;
 	private Product searchResult;
 	//TODO: create a map of string rel and url returned from the web service to be used in navigating the web service
 	
@@ -150,9 +151,13 @@ public class CustomerController {
 	
 	// 1f. Cancel order
 	@RequestMapping(value = "/cancel")
-	public ModelAndView cancelOrder(HttpServletRequest request, HttpServletResponse response) {
+	public ModelAndView cancelOrder(@QueryParam("id") String id, HttpServletRequest request, HttpServletResponse response) {
 		try {
-			lakeshoreServiceManager.cancelOrder(orderForm.getOrderTOList().get(0).getId());
+			lakeshoreServiceManager.cancelOrder(Integer.parseInt(id));
+			// reload the page with updated data
+			// get orders for this customer
+			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId));
+
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("customerForm", customerForm);
 			model.put("orderForm", orderForm);
@@ -166,10 +171,17 @@ public class CustomerController {
 	
 	// 1c. Pay for order 
 	@RequestMapping(value = "/payment")
-	public ModelAndView showPaymentForm() {
+	public ModelAndView showPaymentForm(@QueryParam("id") String id) {
 		try {
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("customerForm", customerForm);
+
+			if (id != null && !id.isEmpty()) {
+				orderId = Integer.parseInt(id);
+			}
+
+			// get orders for this customer
+			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId));
 			model.put("orderForm", orderForm);
 
 			return new ModelAndView("customerOrderPayment", model);		
@@ -184,8 +196,10 @@ public class CustomerController {
 	public ModelAndView processPayment(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			//TODO null check on orderTO
-			Order order = lakeshoreServiceManager.processPayment(orderForm.getOrderTOList().get(0).getId());
-			orderForm = LakeshoreMarketUtil.buildOrderForm(order);
+			lakeshoreServiceManager.processPayment(orderId);
+			// get orders for this customer
+			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId));
+
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("customerForm", customerForm);
 			model.put("orderForm", orderForm);
