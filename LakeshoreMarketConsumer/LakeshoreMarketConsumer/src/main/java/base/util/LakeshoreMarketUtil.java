@@ -83,7 +83,7 @@ public class LakeshoreMarketUtil {
 		try { 
 			urlConnection.setRequestMethod(httpVerb.toString());
 			urlConnection.setRequestProperty("Accept", Constant.MEDIA_TYPE_XML);
-			urlConnection.setRequestProperty("Content-type", Constant.MEDIA_TYPE_XML);
+			urlConnection.setRequestProperty("Content-Type", Constant.MEDIA_TYPE_XML);
 			
 			if (body != null && !body.isEmpty()) {
 				urlConnection.setDoOutput(true);
@@ -92,7 +92,9 @@ public class LakeshoreMarketUtil {
 				os.close();
 			}
 	
-			if(urlConnection.getResponseCode() != Constant.HTTP_RESPONSE_SUCCESS){
+			if(urlConnection.getResponseCode() == Constant.HTTP_RESPONSE_SUCCESS || urlConnection.getResponseCode() == 204){
+				// no -op
+			} else {
 				throw new RuntimeException("Failed : HTTP error code : " + urlConnection.getResponseCode());
 			}
 		} catch (IOException e) {
@@ -124,6 +126,17 @@ public class LakeshoreMarketUtil {
 		productForm.setProductTOList(productTOList);
 
 		return productForm;
+	}
+
+	private static ProductTO buildProductTO(Products.Product product) {
+		ProductTO productTO = new ProductTO();
+		if (product != null) {
+			productTO.setId(product.getProductId());
+			productTO.setPrice(product.getPrice());
+			productTO.setNumAvailable(product.getNumberAvailable());
+			productTO.setDescription(product.getDescription());
+		}
+		return productTO;
 	}
 
 	private static ProductTO buildProductTO(Product product) {
@@ -345,15 +358,16 @@ public class LakeshoreMarketUtil {
 		return orderForm;
 	}
 
-	private static OrderTO buildOrderTO(Order pushedOrder) {
+	private static OrderTO buildOrderTO(Order order) {
 		OrderTO orderTO = new OrderTO();
-		if (pushedOrder != null) {
-			orderTO.setCustomerId(pushedOrder.getCustomerId());
-			orderTO.setId(pushedOrder.getOrderId());
-			orderTO.setPartnerId(pushedOrder.getPartnerId());
+		if (order != null) {
+			orderTO.setCustomerId(order.getCustomerId());
+			orderTO.setId(order.getOrderId());
+			orderTO.setPartnerId(order.getPartnerId());
+			orderTO.setStatus(order.getStatus());
 			// deep clone of list array
 			List<LinkTO> links = new ArrayList<LinkTO>();
-			for (Order.Link link : pushedOrder.getLink()) {
+			for (Order.Link link : order.getLink()) {
 				LinkTO linkTO = new LinkTO();
 				linkTO.setAction(link.getAction());
 				linkTO.setMediaType(link.getMediaType());
@@ -364,7 +378,7 @@ public class LakeshoreMarketUtil {
 			orderTO.setLinks(links);
 			// TODO: allow multiple products in pushed order 
 			List<Integer> products = new ArrayList<Integer>();
-			products.add(pushedOrder.getPartnerId());
+			products.add(order.getPartnerId());
 			orderTO.setProductIds(products);
 		}
 		return orderTO;
@@ -376,20 +390,35 @@ public class LakeshoreMarketUtil {
 	 * @return
 	 * @throws JAXBException
 	 */
-	public static Orders unmarshalOrder(String response) throws JAXBException {
+	public static Orders unmarshalOrders(String response) throws JAXBException {
+		//convert xml file into Java file
+		// make sure the plural form not the singular form is unmarshalled
+		JAXBContext jaxbContext = JAXBContext.newInstance(Orders.class);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		return (Orders) jaxbUnmarshaller.unmarshal(new StringReader(response));
+	}
+	
+
+	/**
+	 * 
+	 * @param response
+	 * @return
+	 * @throws JAXBException
+	 */
+	public static Order unmarshalOrder(String response) throws JAXBException {
 		//convert xml file into Java file
 		JAXBContext jaxbContext = JAXBContext.newInstance(Order.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-		return (Orders) jaxbUnmarshaller.unmarshal(new StringReader(response));
+		return (Order) jaxbUnmarshaller.unmarshal(new StringReader(response));
 	}
 
 	public static ProductForm buildProductForm(Products productList) {
 		ProductForm productForm = new ProductForm();
 
 		if (productList != null) {
-			List<Product> products = productList.getProducts();
+			List<Products.Product> products = productList.getProduct();
 			List<ProductTO> productTOList = new ArrayList<ProductTO>();
-			for (Product product : products) {
+			for (Products.Product product : products) {
 				ProductTO productTO = buildProductTO(product);
 				productTOList.add(productTO);
 			}
@@ -402,9 +431,37 @@ public class LakeshoreMarketUtil {
 
 	public static Products unmarshalProducts(String response) throws JAXBException {
 		//convert xml file into Java file
-		JAXBContext jaxbContext = JAXBContext.newInstance(Product.class);
+		// make sure the plural form of products not the singular form is unmarshalled
+		JAXBContext jaxbContext = JAXBContext.newInstance(Products.class);
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		return (Products) jaxbUnmarshaller.unmarshal(new StringReader(response));
+	}
+
+	public static OrderForm buildOrderForm(Order order) {
+		OrderTO orderTO = buildOrderTO(order);
+		List<OrderTO> orderTOList = new ArrayList<OrderTO>();
+		orderTOList.add(orderTO);
+		OrderForm orderForm = new OrderForm();
+		orderForm.setOrderTOList(orderTOList);
+
+		return orderForm;
+	}
+
+	public static String buildXML(Order order) throws JAXBException {
+		JAXBContext jaxbContext = JAXBContext.newInstance(Order.class);
+		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+		jaxbMarshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+		java.io.StringWriter sw = new StringWriter();
+		jaxbMarshaller.marshal(order, sw);
+
+		return sw.toString();
+	}
+
+	public static OrderForm buildOrderForm(Orders orders) {
+		if (orders != null) {
+			return buildOrderForm(orders.getOrder());
+		}
+		return null;
 	}
 
 

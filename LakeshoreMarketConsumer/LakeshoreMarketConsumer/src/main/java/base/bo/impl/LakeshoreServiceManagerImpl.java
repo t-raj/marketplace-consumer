@@ -5,8 +5,10 @@ import java.io.IOException;
 import javax.xml.bind.JAXBException;
 
 import base.bo.LakeshoreServiceManager;
+import base.constant.Constant;
 import base.constant.HTTPVerb;
 import base.jaxb.Customer;
+import base.jaxb.Order;
 import base.jaxb.Orders;
 import base.jaxb.Partner;
 import base.jaxb.Product;
@@ -96,19 +98,51 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 	@Override
 	public Orders pushOrdersToPartner(int partnerId) throws JAXBException, IOException {
 		String relativePath = "orders/pushedOrders/" + partnerId;
-		return LakeshoreMarketUtil.unmarshalOrder(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
+		return LakeshoreMarketUtil.unmarshalOrders(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
 	}
 
 	@Override
 	public Orders getAcknowledgement(int partnerId) throws JAXBException, IOException {
 		String relativePath = "orders/fulfilled/";
-		return LakeshoreMarketUtil.unmarshalOrder(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
+		return LakeshoreMarketUtil.unmarshalOrders(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
 	}
 
 	@Override
 	public Products getProducts(int partnerID) throws JAXBException, IOException {
 		String relativePath = "products/" + partnerID + "/true"; //boolean flag for active products
 		return LakeshoreMarketUtil.unmarshalProducts(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
+	}
+
+	@Override
+	public Order buyProduct(int productId, int customerId, int partnerId) throws JAXBException, IOException {
+		Order order = new Order();
+		order.setCustomerId(customerId);
+		order.setStatus(Constant.ACCEPTED);
+//		order.setProductId(productId);
+		order.setPartnerId(partnerId);
+		String relativePath = "orders"; 
+		String body = LakeshoreMarketUtil.buildXML(order);
+
+		return LakeshoreMarketUtil.unmarshalOrder(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST, relativePath, body));
+	}
+
+	@Override
+	public Order processPayment(int orderId) throws JAXBException, IOException {
+		String relativePath = "orders/payment/" + orderId;
+		return LakeshoreMarketUtil.unmarshalOrder(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.PUT,relativePath, null));
+	}
+
+	@Override
+	public void cancelOrder(int orderId) throws JAXBException, IOException {
+		String relativePath = "orders/" + orderId;
+		String body = "";
+		LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.DELETE, relativePath, body);
+	}
+
+	@Override
+	public Orders getOrders(int customerId) throws JAXBException, IOException {
+		String relativePath = "orders/" + customerId;
+		return LakeshoreMarketUtil.unmarshalOrders(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET,relativePath, null));
 	}
 
 }

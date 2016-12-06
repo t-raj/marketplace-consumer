@@ -19,6 +19,7 @@ import base.form.ProductForm;
 import base.jaxb.Orders;
 import base.jaxb.Partner;
 import base.jaxb.Product;
+import base.jaxb.Products;
 import base.util.LakeshoreMarketUtil;
 
 /**
@@ -149,8 +150,8 @@ public class PartnerController {
 		try {
 			lakeshoreServiceManager.addProduct(Integer.parseInt(productNumber), description, partner, Integer.parseInt(price));
 			// show all products for the partner
-//			Products products = lakeshoreServiceManager.getProducts(partner);
-//			ProductForm productForm = LakeshoreMarketUtil.buildProductForm(products);
+			Products products = lakeshoreServiceManager.getProducts(partner);
+			ProductForm productForm = LakeshoreMarketUtil.buildProductForm(products);
 			Map<String, Object> model = new HashMap<String, Object>();
 //			model.put("productForm", productForm);
 			model.put("partnerForm", partnerForm);
@@ -168,7 +169,7 @@ public class PartnerController {
 		try {
 			Orders pushedOrders = lakeshoreServiceManager.pushOrdersToPartner(partnerID);
 			// TODO: null check for pushed orders
-			OrderForm orderForm = LakeshoreMarketUtil.buildOrderForm(pushedOrders.getOrders());
+			OrderForm orderForm = LakeshoreMarketUtil.buildOrderForm(pushedOrders);
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("orderForm", orderForm);
 			model.put("partnerForm", partnerForm);
@@ -187,7 +188,7 @@ public class PartnerController {
 		try {
 			Orders fulfilledOrders = lakeshoreServiceManager.getAcknowledgement(partnerID);
 			// TODO: null check for orders
-			OrderForm orderForm = LakeshoreMarketUtil.buildOrderForm(fulfilledOrders.getOrders());
+			OrderForm orderForm = LakeshoreMarketUtil.buildOrderForm(fulfilledOrders);
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("partnerForm", partnerForm);
 			model.put("orderForm", orderForm);

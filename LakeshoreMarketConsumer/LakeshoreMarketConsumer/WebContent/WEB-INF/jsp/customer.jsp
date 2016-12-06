@@ -11,46 +11,47 @@
 <title>Welcome</title>
 </head>
 <body>
-Search products:
+ <br/>
+ 
+ <a href="/LakeshoreMarketConsumer" >Logout</a>
+ <br/>
 
-<!-- form to search for products -->
-<form action="/LakeshoreMarketConsumer/products" method='POST'>
-  Please enter the product number to find a product:
-  <input type="text" name="productNumber" value="" /><br/>    
-  <input type="submit" value="Search"/>  
-	
-</form>
-
-<!-- search results are below -->
-<form:form method="POST" action="" modelAttribute="productForm">
-    <table class="tablesorter">
+<!-- customer info with links to actions --> 			
+<form:form method="POST" action="" modelAttribute="customerForm" id="customerActionForm">
+<table class="tablesorter">
 			<thead class="thfloat textbold">
+				<tr>
+				   <th>Customer Information</th>
+				</tr>
 			    <tr>
-			    	<th>Number</th>
-			    	<th>Product Id</th>			
-			    	<th>Product Description</th>
-			    	<th>Action</th>			
+			    	<th>Id</th>
+			    	<th>Login</th>
+			    	<th>Actions</th>			
 			    </tr>
 		    </thead>
 			<tbody class="texttd">
-			    <c:forEach items="${productForm.productTOList}" var="productTO" varStatus="status">
+			    <c:forEach items="${customerForm.customerTOList}" var="customerTO" varStatus="status">
 			        <tr>
-			            <td><input type="hidden" name="productTOList[${status.index}].id" value="${productTO.id}"/></td> 			           
+			        	<td>
+			        	   	${customerTO.id} <br/>
+			        	</td>
 			            <td>
-			            	${productTO.id} 
+							${customerTO.login} <br/>
 			            </td>
 			            <td>
-			            	${productTO.description}
-			            </td>
-			            <td>
-			            	<!-- Link will include action to buy the product -->
-			                ${productTO.link}
-			            </td>
+			                <div>
+				         	    <c:forEach items="${customerTO.linkList}" var="link" varStatus="status">
+				         	    	<!-- clicking on the link goes to the relative path -->
+					    			<!-- <a href="${link.rel}" onclick="submitForm()"> ${link.action}</a><br>-->
+					    			<a href="${link.rel}"> ${link.action}</a><br> 
+					    		</c:forEach>
+					    	</div>
+						</td>
 			       </tr>
 			    </c:forEach>
 		    </tbody>
 		</table>
-</form:form>
+</form:form> 
 
 </body>
 

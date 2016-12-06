@@ -28,8 +28,8 @@ Welcome to the Lakeshore Market. Please register or login to continue:
 <br/>
 
 <form action="/LakeshoreMarketConsumer/login">  
-    <input type="text" name="uname" value="Name..." onclick="this.value=''"/><br/>    
-    <input type="password" name="upass"  value="Password..." onclick="this.value=''"/><br/>  
+    <input type="text" name="login" value="Name..." onclick="this.value=''"/><br/>    
+    <input type="password" name="password"  value="Password..." onclick="this.value=''"/><br/>  
     <input type="submit" value="login"/>  
 </form>  
 

@@ -43,7 +43,7 @@ function submitForm() {
 			            </td>
 			            <td>
 			                <div>
-				         	    <c:forEach items="${orderTO.linkList}" var="link" varStatus="status">
+				         	    <c:forEach items="${orderTO.links}" var="link" varStatus="status">
 				         	    	<!-- clicking on the link goes to the relative path -->
 					    			<a href="${link.rel}"> ${link.action}</a><br> 
 					    		</c:forEach>

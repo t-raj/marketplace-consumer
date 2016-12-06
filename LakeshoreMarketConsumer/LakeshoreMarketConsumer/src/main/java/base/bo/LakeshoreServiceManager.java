@@ -5,6 +5,7 @@ import java.io.IOException;
 import javax.xml.bind.JAXBException;
 
 import base.jaxb.Customer;
+import base.jaxb.Order;
 import base.jaxb.Orders;
 import base.jaxb.Partner;
 import base.jaxb.Product;
@@ -31,5 +32,13 @@ public interface LakeshoreServiceManager {
 	Orders getAcknowledgement(int partnerId) throws JAXBException, IOException;
 
 	Products getProducts(int partnerID) throws JAXBException, IOException;
+
+	Order buyProduct(int productId, int customerId, int partnerId) throws JAXBException, IOException;
+
+	Order processPayment(int orderId) throws JAXBException, IOException;
+
+	void cancelOrder(int orderId) throws JAXBException, IOException;
+
+	Orders getOrders(int customerId) throws JAXBException, IOException;
 
 }
