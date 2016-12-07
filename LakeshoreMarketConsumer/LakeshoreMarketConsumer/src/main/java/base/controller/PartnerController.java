@@ -111,6 +111,11 @@ public class PartnerController {
 		}
 	}
 	
+	/**
+	 * Find products
+	 * @param productNumber
+	 * @return
+	 */
 	// the form is submitted when a link is clicked. The link is passed as a ModelAttribute and is used to perform the correct action, e.g. add produc t
 	@RequestMapping(value = "/products", method = RequestMethod.POST)
 	public ModelAndView find(@RequestParam("productNumber") String productNumber) {
@@ -128,6 +133,10 @@ public class PartnerController {
 		}
 	}
 
+	/**
+	 * Show add product form
+	 * @return
+	 */
 	// 2b. Add product or products in market place
 	@RequestMapping(value = "/addProduct")
 	public ModelAndView showAddProductForm() {
@@ -142,6 +151,14 @@ public class PartnerController {
 		}
 	}
 
+	/**
+	 * Add product 
+	 * @param productNumber
+	 * @param description
+	 * @param price
+	 * @param partner
+	 * @return
+	 */
 	// 2b. Add product or products in market place
 	@RequestMapping(value = "/addProductForm", method = RequestMethod.POST)
 	public ModelAndView add(@RequestParam("productNumber") String productNumber, 
@@ -163,6 +180,10 @@ public class PartnerController {
 		}
 	}
 
+	/**
+	 * Push order to partner
+	 * @return
+	 */
 	// 2c. Push orders to partner
 	@RequestMapping(value = "/pushedOrders")
 	public ModelAndView pushOrdersToPartner() {
@@ -182,6 +203,10 @@ public class PartnerController {
 		}
 	}
 	
+	/**
+	 * Fulfill orders
+	 * @return
+	 */
 	// 2d. Get acknowledgement of fulfilled orders
 	@RequestMapping(value = "/fulfilledOrders")
 	public ModelAndView getAcknowledgement() {

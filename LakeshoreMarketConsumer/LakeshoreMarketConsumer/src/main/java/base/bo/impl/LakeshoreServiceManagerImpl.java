@@ -103,7 +103,7 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 
 	@Override
 	public Orders getAcknowledgement(int partnerId) throws JAXBException, IOException {
-		String relativePath = "orders/fulfilled/";
+		String relativePath = "orders/fulfilled/" + partnerId;
 		return LakeshoreMarketUtil.unmarshalOrders(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
 	}
 

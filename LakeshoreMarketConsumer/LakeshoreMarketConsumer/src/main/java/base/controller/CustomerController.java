@@ -34,6 +34,14 @@ public class CustomerController {
 	private Product searchResult;
 	//TODO: create a map of string rel and url returned from the web service to be used in navigating the web service
 	
+	/**
+	 * Authenticate customer
+	 * @param login
+	 * @param password
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/login")
 	public ModelAndView authenticate(@RequestParam("login") String login, @RequestParam("password") String password, HttpServletRequest request, HttpServletResponse response) {
 		try {
@@ -64,6 +72,21 @@ public class CustomerController {
 		}
 	}
 
+	/**
+	 * Register customer
+	 * @param id
+	 * @param login
+	 * @param password
+	 * @param firstName
+	 * @param lastName
+	 * @param streetAddress
+	 * @param city
+	 * @param state
+	 * @param zip
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/registerCustomer")
 	public ModelAndView register(@RequestParam("id") String id, @RequestParam("login") String login, @RequestParam("password") String password, 
 			@RequestParam("firstName") String firstName, @RequestParam("lastName") String lastName, @RequestParam("streetAddress") String streetAddress, 
@@ -93,6 +116,10 @@ public class CustomerController {
 		}
 	}
 
+	/**
+	 * Show search product form
+	 * @return
+	 */
 	// 1a. Search by product 
 	@RequestMapping(value = "/searchProducts")
 	public ModelAndView showSearchProductForm() {
@@ -108,6 +135,11 @@ public class CustomerController {
 		}
 	}
 
+	/**
+	 * Get search product result
+	 * @param productNumber
+	 * @return
+	 */
 	// 1a. Search by product 
 	@RequestMapping(value = "/searchProductResult")
 	public ModelAndView showSearchProductResult(@RequestParam("productNumber") String productNumber) {
@@ -129,6 +161,12 @@ public class CustomerController {
 		}
 	}
 	
+	/**
+	 * Buy product
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	// 1a. Buy a product 
 	@RequestMapping(value = "/buy")
 	public ModelAndView buyProduct(HttpServletRequest request, HttpServletResponse response) {
@@ -149,6 +187,13 @@ public class CustomerController {
 		}
 	}
 	
+	/**
+	 * Cancel order
+	 * @param id
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	// 1f. Cancel order
 	@RequestMapping(value = "/cancel")
 	public ModelAndView cancelOrder(@QueryParam("id") String id, HttpServletRequest request, HttpServletResponse response) {
@@ -169,6 +214,11 @@ public class CustomerController {
 		}
 	}
 	
+	/**
+	 * Pay for order
+	 * @param id
+	 * @return
+	 */
 	// 1c. Pay for order 
 	@RequestMapping(value = "/payment")
 	public ModelAndView showPaymentForm(@QueryParam("id") String id) {
@@ -191,7 +241,12 @@ public class CustomerController {
 		}
 	}
 	
-	// 1c. Pay for order 
+	/**
+	 * Process payment
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/processPayment")
 	public ModelAndView processPayment(HttpServletRequest request, HttpServletResponse response) {
 		try {
@@ -204,6 +259,30 @@ public class CustomerController {
 			model.put("customerForm", customerForm);
 			model.put("orderForm", orderForm);
 			model.put("message", "Payment processed");
+			return new ModelAndView("customerOrder", model);		
+		} catch(Exception e) {
+			e.getMessage();
+			return new ModelAndView("error");
+		}
+	}
+
+	/**
+	 * Pay for order
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	// 1c. Pay for order 
+	@RequestMapping(value = "/status")
+	public ModelAndView checkStatus(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			// get orders for this customer
+			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId));
+
+			Map<String, Object> model = new HashMap<String, Object>();
+			model.put("customerForm", customerForm);
+			model.put("orderForm", orderForm);
+			
 			return new ModelAndView("customerOrder", model);		
 		} catch(Exception e) {
 			e.getMessage();

@@ -38,7 +38,7 @@ import base.jaxb.Products;
 public class LakeshoreMarketUtil {
 
 	/**
-	 * 
+	 * Builds partner TO
 	 * @param partner
 	 * @return
 	 */
@@ -69,7 +69,7 @@ public class LakeshoreMarketUtil {
 	}
 
 	/**
-	 * 
+	 * Sends HTTP Request
 	 * @param httpVerb
 	 * @param relativePath
 	 * @param body
@@ -114,7 +114,7 @@ public class LakeshoreMarketUtil {
 	}
 
 	/**
-	 * 
+	 * Builds Product Form
 	 * @param product
 	 * @return
 	 */
@@ -152,7 +152,7 @@ public class LakeshoreMarketUtil {
 	}
 
 	/**
-	 * 
+	 * Build Link TO list
 	 * @param links
 	 * @return
 	 */
@@ -175,7 +175,7 @@ public class LakeshoreMarketUtil {
 	}
 
 	/**
-	 * 
+	 * Builds TO list
 	 * @param links
 	 * @return
 	 */
@@ -198,7 +198,7 @@ public class LakeshoreMarketUtil {
 	}
 
 	/**
-	 * 
+	 * Builds Partner Form
 	 * @param partner
 	 * @return
 	 */
@@ -287,7 +287,7 @@ public class LakeshoreMarketUtil {
 	}
 
 	/**
-	 * 
+	 * Unmarshal product xml
 	 * @param response
 	 * @return
 	 * @throws JAXBException
@@ -300,7 +300,7 @@ public class LakeshoreMarketUtil {
 	}
 
 	/**
-	 * 
+	 * Build customer form
 	 * @param customer
 	 * @return
 	 */
@@ -341,7 +341,7 @@ public class LakeshoreMarketUtil {
 	}
 
 	/**
-	 * 
+	 * Build Order form
 	 * @param pushedOrders
 	 * @return
 	 */
@@ -385,7 +385,7 @@ public class LakeshoreMarketUtil {
 	}
 
 	/**
-	 * 
+	 * Unmarshal order xml
 	 * @param response
 	 * @return
 	 * @throws JAXBException
@@ -412,6 +412,11 @@ public class LakeshoreMarketUtil {
 		return (Order) jaxbUnmarshaller.unmarshal(new StringReader(response));
 	}
 
+	/**
+	 * Build product form
+	 * @param productList
+	 * @return
+	 */
 	public static ProductForm buildProductForm(Products productList) {
 		ProductForm productForm = new ProductForm();
 
@@ -429,6 +434,12 @@ public class LakeshoreMarketUtil {
 		return productForm;
 	}
 
+	/**
+	 * Unmarshal products
+	 * @param response
+	 * @return
+	 * @throws JAXBException
+	 */
 	public static Products unmarshalProducts(String response) throws JAXBException {
 		//convert xml file into Java file
 		// make sure the plural form of products not the singular form is unmarshalled
@@ -437,6 +448,11 @@ public class LakeshoreMarketUtil {
 		return (Products) jaxbUnmarshaller.unmarshal(new StringReader(response));
 	}
 
+	/**
+	 * Build order form 
+	 * @param order
+	 * @return
+	 */
 	public static OrderForm buildOrderForm(Order order) {
 		OrderTO orderTO = buildOrderTO(order);
 		List<OrderTO> orderTOList = new ArrayList<OrderTO>();
@@ -447,6 +463,12 @@ public class LakeshoreMarketUtil {
 		return orderForm;
 	}
 
+	/**
+	 * Marshal order object from xml
+	 * @param order
+	 * @return
+	 * @throws JAXBException
+	 */
 	public static String buildXML(Order order) throws JAXBException {
 		JAXBContext jaxbContext = JAXBContext.newInstance(Order.class);
 		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
@@ -457,6 +479,11 @@ public class LakeshoreMarketUtil {
 		return sw.toString();
 	}
 
+	/**
+	 * Build order form with multiple orders
+	 * @param orders
+	 * @return
+	 */
 	public static OrderForm buildOrderForm(Orders orders) {
 		if (orders != null) {
 			return buildOrderForm(orders.getOrder());
