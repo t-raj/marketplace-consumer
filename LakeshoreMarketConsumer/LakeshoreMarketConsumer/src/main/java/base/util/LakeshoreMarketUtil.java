@@ -9,7 +9,9 @@ import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -22,7 +24,6 @@ import base.bean.OrderTO;
 import base.bean.PartnerTO;
 import base.bean.ProductTO;
 import base.constant.Constant;
-import base.constant.HTTPVerb;
 import base.form.CustomerForm;
 import base.form.OrderForm;
 import base.form.PartnerForm;
@@ -71,29 +72,30 @@ public class LakeshoreMarketUtil {
 	/**
 	 * Sends HTTP Request
 	 * @param httpVerb
-	 * @param relativePath
+	 * @param url
 	 * @param body
+	 * @param  
 	 * @return
 	 * @throws IOException
 	 */
-	public static String sendHTTPRequest(HTTPVerb httpVerb, String relativePath, String body) throws IOException {
-		URL url = new URL(Constant.BASE_URL + relativePath);
+	public static String sendHTTPRequest(String httpVerb, String urlRequest, String body) throws IOException {
+		URL url = new URL(urlRequest);
 		HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
 		try { 
-			urlConnection.setRequestMethod(httpVerb.toString());
+			urlConnection.setRequestMethod(httpVerb);
 			urlConnection.setRequestProperty("Accept", Constant.MEDIA_TYPE_XML);
 			urlConnection.setRequestProperty("Content-Type", Constant.MEDIA_TYPE_XML);
-			
+
 			if (body != null && !body.isEmpty()) {
 				urlConnection.setDoOutput(true);
 				OutputStream os = urlConnection.getOutputStream();
 				os.write(body.getBytes("UTF-8"));
 				os.close();
 			}
-	
+
+			// no -op
 			if(urlConnection.getResponseCode() == Constant.HTTP_RESPONSE_SUCCESS || urlConnection.getResponseCode() == 204){
-				// no -op
 			} else {
 				throw new RuntimeException("Failed : HTTP error code : " + urlConnection.getResponseCode());
 			}
@@ -109,7 +111,7 @@ public class LakeshoreMarketUtil {
 			response.append(inputLine);
 		}
 		bufferReader.close();
-		
+
 		return response.toString();
 	}
 
@@ -160,7 +162,7 @@ public class LakeshoreMarketUtil {
 		if (links == null || links.isEmpty()) {
 			return null;
 		}
-		
+
 		List<LinkTO> linkTOs = new ArrayList<LinkTO>();
 		for (Link link : links) {
 			LinkTO linkTO = new LinkTO();
@@ -170,7 +172,7 @@ public class LakeshoreMarketUtil {
 			linkTO.setUrl(link.getUrl());
 			linkTOs.add(linkTO);
 		}
-		
+
 		return linkTOs;
 	}
 
@@ -183,7 +185,7 @@ public class LakeshoreMarketUtil {
 		if (links == null || links.isEmpty()) {
 			return null;
 		}
-		
+
 		List<LinkTO> linkTOs = new ArrayList<LinkTO>();
 		for (Partner.Link link : links) {
 			LinkTO linkTO = new LinkTO();
@@ -193,7 +195,7 @@ public class LakeshoreMarketUtil {
 			linkTO.setUrl(link.getUrl());
 			linkTOs.add(linkTO);
 		}
-		
+
 		return linkTOs;
 	}
 
@@ -225,7 +227,7 @@ public class LakeshoreMarketUtil {
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		return (Partner) jaxbUnmarshaller.unmarshal(new StringReader(response));
 	}
-	
+
 	/**
 	 * Convert xml string into Java object Customer
 	 * @param response
@@ -253,7 +255,7 @@ public class LakeshoreMarketUtil {
 
 		return sw.toString();
 	}
-	
+
 	/**
 	 * Create customer xml 
 	 * @param customer
@@ -351,7 +353,7 @@ public class LakeshoreMarketUtil {
 			OrderTO orderTO = buildOrderTO(pushedOrder);
 			orderTOList.add(orderTO);
 		}
-		
+
 		OrderForm orderForm = new OrderForm();
 		orderForm.setOrderTOList(orderTOList);
 
@@ -376,7 +378,7 @@ public class LakeshoreMarketUtil {
 				links.add(linkTO);
 			}
 			orderTO.setLinks(links);
-			// TODO: allow multiple products in pushed order 
+			// TODO: for future enhancement: allow multiple products in pushed order 
 			List<Integer> products = new ArrayList<Integer>();
 			products.add(order.getPartnerId());
 			orderTO.setProductIds(products);
@@ -397,7 +399,7 @@ public class LakeshoreMarketUtil {
 		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 		return (Orders) jaxbUnmarshaller.unmarshal(new StringReader(response));
 	}
-	
+
 
 	/**
 	 * 
@@ -427,7 +429,7 @@ public class LakeshoreMarketUtil {
 				ProductTO productTO = buildProductTO(product);
 				productTOList.add(productTO);
 			}
-			
+
 			productForm.setProductTOList(productTOList);
 		}
 
@@ -489,6 +491,99 @@ public class LakeshoreMarketUtil {
 			return buildOrderForm(orders.getOrder());
 		}
 		return null;
+	}
+
+	public static Map<String,String> buildLinkMap(List<base.jaxb.Customer.Link> links) {
+		Map<String,String> linkMap = new HashMap<String,String>();
+		if (!isEmptyCustomer(links)) {
+			for (Customer.Link link : links) {
+				linkMap.put(link.getRel(), link.getUrl());
+			}
+		}
+		return linkMap;
+
+	}
+
+	public static Map<String, String> buildLinkMapPartner(List<base.jaxb.Partner.Link> links) {
+		Map<String,String> linkMap = new HashMap<String,String>();
+		if (!isEmpty(links)) {
+			for (Partner.Link link : links) {
+				linkMap.put(link.getRel(), link.getUrl());
+			}
+		}
+		return linkMap;
+	}
+
+	public static Map<String, String> buildVerbMap(List<base.jaxb.Customer.Link> links) {
+		Map<String,String> linkMap = new HashMap<String,String>();
+		if (!isEmptyCustomer(links)) {
+			for (Customer.Link link : links) {
+				linkMap.put(link.getRel(), link.getAction());
+			}
+		}
+		return linkMap;
+	}
+
+	private static boolean isEmptyCustomer(List<base.jaxb.Customer.Link> links) {
+		return links == null || links.isEmpty();
+	}
+
+	public static Map<String, String> buildVerbMapPartner(List<base.jaxb.Partner.Link> links) {
+		Map<String,String> linkMap = new HashMap<String,String>();
+		if (!isEmpty(links)) {
+			for (Partner.Link link : links) {
+				linkMap.put(link.getRel(), link.getAction());
+			}
+		}
+		return linkMap;
+	}
+
+	public static void addToVerbMap(Map<String, String> verbMap, List<Link> links) {
+		if (!isEmpty(links) && verbMap != null) {
+			for (Link link : links) {
+				verbMap.put(link.getRel(), link.getAction());
+			}
+		}
+
+	}
+
+	private static boolean isEmpty(List<?> links) {
+		return links == null || links.isEmpty();
+	}
+
+	public static void addToLinkMap(Map<String, String> linkMap, List<Link> links) {
+		if (!isEmpty(links) && linkMap != null) {
+			for (Link link : links) {
+				linkMap.put(link.getRel(), link.getUrl());
+			}
+		}
+
+	}
+
+	public static void addToLinkMap(Map<String, String> linkMap, Orders orders) {
+		if (orders != null && !isEmpty(orders.getOrder())) {
+			List<Order> orderList = orders.getOrder();
+			for (Order order : orderList) {
+				List<base.jaxb.Order.Link> links = order.getLink();
+				for (base.jaxb.Order.Link link : links) {
+					linkMap.put(link.getRel(), link.getUrl());
+				}
+			}
+
+		}
+
+	}
+
+	public static void addToVerbMap(Map<String, String> verbMap, Orders orders) {
+		if (orders != null && !isEmpty(orders.getOrder())) {
+			List<Order> orderList = orders.getOrder();
+			for (Order order : orderList) {
+				List<base.jaxb.Order.Link> links = order.getLink();
+				for (base.jaxb.Order.Link link : links) {
+					verbMap.put(link.getRel(), link.getAction());
+				}
+			}
+		}
 	}
 
 

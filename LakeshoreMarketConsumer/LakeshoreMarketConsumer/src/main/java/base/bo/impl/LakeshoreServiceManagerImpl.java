@@ -22,35 +22,29 @@ import base.util.LakeshoreMarketUtil;
  */
 public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 
-	@Override
-	public Product getProduct(int productNumber) throws IOException, JAXBException {
-		String relativePath = "products/" + productNumber;
-		return LakeshoreMarketUtil.unmarshalProduct(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
-	}
 
 	@Override
-	public void addProduct(int productNum, String description, int partnerId, int price) throws IOException, JAXBException {
+	public void addProduct(int productNum, String description, int partnerId, int price, String linkUrl, String httpVerb) throws IOException, JAXBException {
 		Product product = new Product();
 		product.setNumberAvailable(1);
 		product.setPartnerId(partnerId);
 		product.setProductId(productNum);
 		product.setPrice(price);
 		product.setDescription(description);
-		String relativePath = "products";
 		String body = LakeshoreMarketUtil.buildXML(product);
-		LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST, relativePath, body);
+		LakeshoreMarketUtil.sendHTTPRequest(httpVerb, linkUrl, body);
 	}
 
 	@Override
 	public Customer getCustomer(String login) throws JAXBException, IOException {
-		String relativePath = "/customers/" + login;
-		return LakeshoreMarketUtil.unmarshalCustomer(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
+		String fullUrl = Constant.BASE_URL + "customers/" + login;
+		return LakeshoreMarketUtil.unmarshalCustomer(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET.toString(), fullUrl, null));
 	}
 
 	@Override
 	public Partner getPartner(String login) throws IOException, JAXBException {
-		String relativePath = "partners/" + login;
-		return LakeshoreMarketUtil.unmarshalPartner(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
+		String fullUrl = Constant.BASE_URL + "partners/" + login;
+		return LakeshoreMarketUtil.unmarshalPartner(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET.toString(), fullUrl, null));
 	}
 
 	@Override
@@ -68,9 +62,10 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 		customer.setState(state);
 		customer.setCity(city);
 		customer.setZipCode(Integer.parseInt(zip));
-		String relativePath = "customers";
 		String body = LakeshoreMarketUtil.buildXML(customer);
-		return LakeshoreMarketUtil.unmarshalCustomer(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST, relativePath, body));		
+		String fullUrl = Constant.BASE_CONSUMER_URL + "customers/";
+
+		return LakeshoreMarketUtil.unmarshalCustomer(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST.toString(), fullUrl, body));		
 	}
 
 	@Override
@@ -88,61 +83,67 @@ public class LakeshoreServiceManagerImpl implements LakeshoreServiceManager {
 		partner.setState(state);
 		partner.setCity(city);
 		partner.setZipCode(Integer.parseInt(zip));
-		String relativePath = "partners";
 		String body = LakeshoreMarketUtil.buildXML(partner);
-		String response = LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST, relativePath, body);		
+		String linkUrl = Constant.BASE_CONSUMER_URL + "partners/";
+
+		String response = LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST.toString(), linkUrl, body);		
 	
 		return LakeshoreMarketUtil.unmarshalPartner(response);
 	}
 
 	@Override
-	public Orders pushOrdersToPartner(int partnerId) throws JAXBException, IOException {
-		String relativePath = "orders/pushedOrders/" + partnerId;
-		return LakeshoreMarketUtil.unmarshalOrders(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
+	public Orders pushOrdersToPartner(int partnerId, String linkUrl, String httpVerb) throws JAXBException, IOException {
+		String fullUrl = linkUrl + partnerId;
+		return LakeshoreMarketUtil.unmarshalOrders(LakeshoreMarketUtil.sendHTTPRequest(httpVerb, fullUrl, null));
 	}
 
 	@Override
-	public Orders getAcknowledgement(int partnerId) throws JAXBException, IOException {
-		String relativePath = "orders/fulfilled/" + partnerId;
-		return LakeshoreMarketUtil.unmarshalOrders(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
+	public Orders getAcknowledgement(int partnerId, String linkUrl, String httpVerb) throws JAXBException, IOException {
+		String fullUrl = linkUrl + "/" + partnerId;
+		return LakeshoreMarketUtil.unmarshalOrders(LakeshoreMarketUtil.sendHTTPRequest(httpVerb, fullUrl, null));
 	}
 
 	@Override
 	public Products getProducts(int partnerID) throws JAXBException, IOException {
-		String relativePath = "products/" + partnerID + "/true"; //boolean flag for active products
-		return LakeshoreMarketUtil.unmarshalProducts(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET, relativePath, null));
+		String fullUrl = Constant.BASE_URL + "products/" + partnerID + "/true"; //boolean flag for active products
+		return LakeshoreMarketUtil.unmarshalProducts(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET.toString(), fullUrl, null));
 	}
 
 	@Override
-	public Order buyProduct(int productId, int customerId, int partnerId) throws JAXBException, IOException {
+	public Order buyProduct(int productId, int customerId, int partnerId, String linkUrl, String httpVerb) throws JAXBException, IOException {
 		Order order = new Order();
 		order.setCustomerId(customerId);
 		order.setStatus(Constant.ACCEPTED);
 //		order.setProductId(productId);
 		order.setPartnerId(partnerId);
-		String relativePath = "orders"; 
 		String body = LakeshoreMarketUtil.buildXML(order);
 
-		return LakeshoreMarketUtil.unmarshalOrder(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.POST, relativePath, body));
+		return LakeshoreMarketUtil.unmarshalOrder(LakeshoreMarketUtil.sendHTTPRequest(httpVerb, linkUrl, body));
 	}
 
 	@Override
-	public Order processPayment(int orderId) throws JAXBException, IOException {
-		String relativePath = "orders/payment/" + orderId;
-		return LakeshoreMarketUtil.unmarshalOrder(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.PUT,relativePath, null));
+	public Order processPayment(int orderId, String linkUrl, String httpVerb) throws JAXBException, IOException {
+		String fullUrl = linkUrl + "/" + orderId;
+		return LakeshoreMarketUtil.unmarshalOrder(LakeshoreMarketUtil.sendHTTPRequest(httpVerb, fullUrl, null));
 	}
 
 	@Override
-	public void cancelOrder(int orderId) throws JAXBException, IOException {
-		String relativePath = "orders/" + orderId;
+	public void cancelOrder(int orderId, String linkUrl, String httpVerb) throws JAXBException, IOException {
+		String fullUrl = linkUrl  + "/" + orderId;
 		String body = "";
-		LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.DELETE, relativePath, body);
+		LakeshoreMarketUtil.sendHTTPRequest(httpVerb, fullUrl, body);
 	}
 
 	@Override
-	public Orders getOrders(int customerId) throws JAXBException, IOException {
-		String relativePath = "orders/" + customerId;
-		return LakeshoreMarketUtil.unmarshalOrders(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET,relativePath, null));
+	public Orders getOrders(int customerId, String url, String verb) throws JAXBException, IOException {
+		String fullUrl = url + customerId;
+		return LakeshoreMarketUtil.unmarshalOrders(LakeshoreMarketUtil.sendHTTPRequest(verb, fullUrl, null));
 	}
+
+	@Override
+	public Product getProduct(int productNumber) throws IOException, JAXBException {
+		String fullUrl = Constant.BASE_URL + "products/" + productNumber;
+		return LakeshoreMarketUtil.unmarshalProduct(LakeshoreMarketUtil.sendHTTPRequest(HTTPVerb.GET.toString(), fullUrl, null));
+		}
 
 }

@@ -15,11 +15,13 @@ import org.springframework.web.servlet.ModelAndView;
 
 import base.bo.LakeshoreServiceManager;
 import base.bo.impl.LakeshoreServiceManagerImpl;
+import base.constant.Constant;
 import base.form.CustomerForm;
 import base.form.OrderForm;
 import base.form.ProductForm;
 import base.jaxb.Customer;
 import base.jaxb.Order;
+import base.jaxb.Orders;
 import base.jaxb.Product;
 import base.util.LakeshoreMarketUtil;
 
@@ -32,7 +34,10 @@ public class CustomerController {
 	private int customerId;
 	private int orderId;
 	private Product searchResult;
-	//TODO: create a map of string rel and url returned from the web service to be used in navigating the web service
+	//map of string rel and url returned from the web service to be used in navigating the web service
+	private Map<String,String> linkMap = new HashMap<String,String>();
+	// map of http verbs for each rel action
+	private Map<String,String> verbMap = new HashMap<String,String>();
 	
 	/**
 	 * Authenticate customer
@@ -47,10 +52,20 @@ public class CustomerController {
 		try {
 			Customer customer = lakeshoreServiceManager.getCustomer(login);
 			if (customer != null && password != null && password.equals(customer.getPassword())) {
+				// add links to map
+				linkMap = LakeshoreMarketUtil.buildLinkMap(customer.getLink());
+				// add http verbs to map
+				verbMap = LakeshoreMarketUtil.buildVerbMap(customer.getLink());
+				
 				CustomerForm customerForm = LakeshoreMarketUtil.buildCustomerForm(customer);
-				// get orders for this customer
-				orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customer.getId()));
 
+				// get orders for this customer
+				Orders orders = lakeshoreServiceManager.getOrders(customer.getId(), linkMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders"), verbMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders"));
+				orderForm = LakeshoreMarketUtil.buildOrderForm(orders);
+				// add order links to map
+				LakeshoreMarketUtil.addToLinkMap(linkMap, orders);
+				LakeshoreMarketUtil.addToVerbMap(verbMap, orders);
+		
 				Map<String, Object> model = new HashMap<String, Object>();
 				model.put("customerForm", customerForm);
 				model.put("orderForm", orderForm);
@@ -93,11 +108,20 @@ public class CustomerController {
 			@RequestParam("city") String city,  @RequestParam("state") String state, @RequestParam("zip") String zip, HttpServletRequest request, HttpServletResponse response) {
 		try {
 			Customer customer = lakeshoreServiceManager.registerCustomer(id, login, password, firstName, lastName, streetAddress, city, state, zip);
-
+			// add links to map
+			linkMap = LakeshoreMarketUtil.buildLinkMap(customer.getLink());
+			// add http verbs to map
+			verbMap = LakeshoreMarketUtil.buildVerbMap(customer.getLink());
+		
 			CustomerForm customerForm = LakeshoreMarketUtil.buildCustomerForm(customer);
 			// get orders for this customer
-			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(Integer.parseInt(id)));
-
+			Orders orders = lakeshoreServiceManager.getOrders(Integer.parseInt(id), linkMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders"), verbMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders"));
+			orderForm = LakeshoreMarketUtil.buildOrderForm(orders);
+			
+			// add order links to map
+			LakeshoreMarketUtil.addToLinkMap(linkMap, orders);
+			LakeshoreMarketUtil.addToVerbMap(verbMap, orders);
+				
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("customerForm", customerForm);
 			model.put("orderForm", orderForm);
@@ -149,6 +173,12 @@ public class CustomerController {
 			// cache search result to be used in creating the order
 			searchResult = product;
 			
+			// add actions to maps
+			if (product != null) {
+				LakeshoreMarketUtil.addToLinkMap(linkMap, product.getLink());
+				LakeshoreMarketUtil.addToVerbMap(verbMap, product.getLink());
+			}
+
 			ProductForm productForm = LakeshoreMarketUtil.buildProductForm(product);
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("productForm", productForm);
@@ -171,7 +201,7 @@ public class CustomerController {
 	@RequestMapping(value = "/buy")
 	public ModelAndView buyProduct(HttpServletRequest request, HttpServletResponse response) {
 		try {
-			Order order = lakeshoreServiceManager.buyProduct(searchResult.getProductId(), customerId, searchResult.getPartnerId());
+			Order order = lakeshoreServiceManager.buyProduct(searchResult.getProductId(), customerId, searchResult.getPartnerId(), linkMap.get(Constant.BASE_CONSUMER_URL_KEY + "buy"), verbMap.get(Constant.BASE_CONSUMER_URL_KEY + "buy"));
 			OrderForm orderForm = LakeshoreMarketUtil.buildOrderForm(order);
 			// cache order form
 			this.orderForm = orderForm;
@@ -198,10 +228,10 @@ public class CustomerController {
 	@RequestMapping(value = "/cancel")
 	public ModelAndView cancelOrder(@QueryParam("id") String id, HttpServletRequest request, HttpServletResponse response) {
 		try {
-			lakeshoreServiceManager.cancelOrder(Integer.parseInt(id));
+			lakeshoreServiceManager.cancelOrder(Integer.parseInt(id), linkMap.get(Constant.BASE_CONSUMER_URL_KEY + "cancel"), verbMap.get(Constant.BASE_CONSUMER_URL_KEY + "cancel"));
 			// reload the page with updated data
 			// get orders for this customer
-			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId));
+			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId, linkMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders"), verbMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders")));
 
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("customerForm", customerForm);
@@ -231,7 +261,7 @@ public class CustomerController {
 			}
 
 			// get orders for this customer
-			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId));
+			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId, linkMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders"), verbMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders")));
 			model.put("orderForm", orderForm);
 
 			return new ModelAndView("customerOrderPayment", model);		
@@ -251,9 +281,9 @@ public class CustomerController {
 	public ModelAndView processPayment(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			//TODO null check on orderTO
-			lakeshoreServiceManager.processPayment(orderId);
+			lakeshoreServiceManager.processPayment(orderId, linkMap.get(Constant.BASE_CONSUMER_URL_KEY + "payment"), verbMap.get(Constant.BASE_CONSUMER_URL_KEY + "payment"));
 			// get orders for this customer
-			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId));
+			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId, linkMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders"), verbMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders")));
 
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("customerForm", customerForm);
@@ -273,11 +303,11 @@ public class CustomerController {
 	 * @return
 	 */
 	// 1c. Pay for order 
-	@RequestMapping(value = "/status")
+	@RequestMapping(value = "/orders")
 	public ModelAndView checkStatus(HttpServletRequest request, HttpServletResponse response) {
 		try {
 			// get orders for this customer
-			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId));
+			orderForm = LakeshoreMarketUtil.buildOrderForm(lakeshoreServiceManager.getOrders(customerId, linkMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders"), verbMap.get(Constant.BASE_CONSUMER_URL_KEY + "orders")));
 
 			Map<String, Object> model = new HashMap<String, Object>();
 			model.put("customerForm", customerForm);

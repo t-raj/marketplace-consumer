@@ -46,7 +46,7 @@
 			    			 <div>
 				         	    <c:forEach items="${productTO.links}" var="link" varStatus="status">
 				         	    	<!-- clicking on the link goes to the relative path -->
-					    			<a href="${link.rel}"> ${link.action}</a><br> 
+					    			<a href="${link.rel}"> ${link.rel}</a><br> 
 					    		</c:forEach>
 					    	</div>
 			            </td>

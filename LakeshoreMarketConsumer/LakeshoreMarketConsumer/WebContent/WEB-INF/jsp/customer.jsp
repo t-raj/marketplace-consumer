@@ -42,8 +42,7 @@
 			                <div>
 				         	    <c:forEach items="${customerTO.linkList}" var="link" varStatus="status">
 				         	    	<!-- clicking on the link goes to the relative path -->
-					    			<!-- <a href="${link.rel}" onclick="submitForm()"> ${link.action}</a><br>-->
-					    			<a href="${link.rel}"> ${link.action}</a><br> 
+					    			<a href="${link.rel}"> ${link.rel}</a><br> 
 					    		</c:forEach>
 					    	</div>
 						</td>

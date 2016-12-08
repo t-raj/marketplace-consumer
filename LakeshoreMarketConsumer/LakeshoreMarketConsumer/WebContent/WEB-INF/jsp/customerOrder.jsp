@@ -40,7 +40,7 @@
 			                <div>
 				         	    <c:forEach items="${orderTO.links}" var="link" varStatus="status">
 				         	    	<!-- clicking on the link goes to the relative path -->
-					    			<a href="${link.rel}?id=${orderTO.id}"> ${link.action}</a><br> 
+					    			<a href="${link.rel}?id=${orderTO.id}"> ${link.rel}</a><br> 
 					    		</c:forEach>
 					    	</div>
 						</td>

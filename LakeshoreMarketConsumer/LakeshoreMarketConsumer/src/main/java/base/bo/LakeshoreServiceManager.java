@@ -16,6 +16,8 @@ public interface LakeshoreServiceManager {
 	/**
 	 * Get product from db
 	 * @param productNumber
+	 * @param linkUrl 
+	 * @param httpVerb 
 	 * @return
 	 * @throws IOException
 	 * @throws JAXBException
@@ -31,7 +33,7 @@ public interface LakeshoreServiceManager {
 	 * @throws IOException
 	 * @throws JAXBException
 	 */
-	void addProduct(int productNum, String description, int partnerId, int price) throws IOException, JAXBException;
+	void addProduct(int productNum, String description, int partnerId, int price, String linkUrl, String httpVerb) throws IOException, JAXBException;
 
 	/**
 	 * Get Customer
@@ -94,7 +96,7 @@ public interface LakeshoreServiceManager {
 	 * @throws JAXBException
 	 * @throws IOException
 	 */
-	Orders pushOrdersToPartner(int partnerId) throws JAXBException, IOException;
+	Orders pushOrdersToPartner(int partnerId, String linkUrl, String httpVerb) throws JAXBException, IOException;
 
 	/**
 	 * Get acknowledgement
@@ -103,7 +105,7 @@ public interface LakeshoreServiceManager {
 	 * @throws JAXBException
 	 * @throws IOException
 	 */
-	Orders getAcknowledgement(int partnerId) throws JAXBException, IOException;
+	Orders getAcknowledgement(int partnerId, String linkUrl, String httpVerb) throws JAXBException, IOException;
 
 	/**
 	 * Get products
@@ -119,36 +121,46 @@ public interface LakeshoreServiceManager {
 	 * @param productId
 	 * @param customerId
 	 * @param partnerId
+	 * @param httpVerb 
+	 * @param url 
 	 * @return
 	 * @throws JAXBException
 	 * @throws IOException
 	 */
-	Order buyProduct(int productId, int customerId, int partnerId) throws JAXBException, IOException;
+	Order buyProduct(int productId, int customerId, int partnerId, String url, String httpVerb) throws JAXBException, IOException;
 
 	/**
 	 * Process payment
 	 * @param orderId
+	 * @param httpVerb 
+	 * @param url 
 	 * @return
 	 * @throws JAXBException
 	 * @throws IOException
 	 */
-	Order processPayment(int orderId) throws JAXBException, IOException;
+	Order processPayment(int orderId, String url, String httpVerb) throws JAXBException, IOException;
 
 	/**
 	 * Cancel order
 	 * @param orderId
+	 * @param httpVerb 
+	 * @param url 
 	 * @throws JAXBException
 	 * @throws IOException
 	 */
-	void cancelOrder(int orderId) throws JAXBException, IOException;
+	void cancelOrder(int orderId, String url, String httpVerb) throws JAXBException, IOException;
 
 	/**
 	 * Get orders
 	 * @param customerId
+	 * @param verb 
+	 * @param url 
+	 * @param httpVerb 
+	 * @param url 
 	 * @return
 	 * @throws JAXBException
 	 * @throws IOException
 	 */
-	Orders getOrders(int customerId) throws JAXBException, IOException;
+	Orders getOrders(int customerId, String url, String verb) throws JAXBException, IOException;
 
 }
